@@ -22,9 +22,12 @@ const Head = ({ kicker, title, sub }) => (
   </div>
 )
 
+// nombre + primer apellido: "Alvaro Ariel Torrez Calle" → "AT"
+const initials = name => { const w = name.split(' '); return w[0][0] + w[Math.max(1, w.length - 2)][0] }
+
 const Avatar = ({ p, size = 48 }) => p.photo
   ? <img className="avatar" src={img(p.photo, 200)} alt={p.person} width={size} height={size} />
-  : <span className={`avatar initials bg-${p.color}`} style={{ width: size, height: size }}>{p.person.split(' ').map(w => w[0]).join('')}</span>
+  : <span className={`avatar initials bg-${p.color}`} style={{ width: size, height: size }}>{initials(p.person)}</span>
 
 const Video = ({ id, title }) => (
   <div className="video">
@@ -519,16 +522,13 @@ function Kanban() {
   const [text, setText] = useState('')
   const [role, setRole] = useState('coordinador')
   const [over, setOver] = useState(null)
+  const [dragging, setDragging] = useState(null)
   const done = tasks.filter(t => t.col === 'done').length
   const pct = tasks.length ? Math.round(done / tasks.length * 100) : 0
 
   useEffect(() => { try { localStorage.setItem('iatech-kanban-v2', JSON.stringify(tasks)) } catch { /* storage blocked */ } }, [tasks])
 
   const move = (id, col) => setTasks(ts => ts.map(t => t.id === id ? { ...t, col } : t))
-  const shift = (t, dir) => {
-    const i = COLUMNS.findIndex(c => c[0] === t.col) + dir
-    if (COLUMNS[i]) move(t.id, COLUMNS[i][0])
-  }
   const add = e => {
     e.preventDefault()
     if (!text.trim()) return
@@ -555,21 +555,20 @@ function Kanban() {
           const list = tasks.filter(t => t.col === id)
           return (
             <div key={id} className={`col bg-${c} ${over === id ? 'over' : ''}`}
-              onDragOver={e => { e.preventDefault(); setOver(id) }} onDragLeave={() => setOver(null)}
+              onDragOver={e => { e.preventDefault(); setOver(id) }}
+              onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget)) setOver(null) }}
               onDrop={e => { move(Number(e.dataTransfer.getData('text')), id); setOver(null) }}>
               <h4>{name} <span>{list.length}</span></h4>
               {list.map(t => {
                 const p = PUESTOS.find(x => x.clave === t.who) ?? PUESTOS[0]
                 return (
-                <div key={t.id} className={`task ${t.col === 'done' ? 'done' : ''}`} draggable onDragStart={e => e.dataTransfer.setData('text', t.id)}>
+                <div key={t.id} className={`task ${t.col === 'done' ? 'done' : ''} ${dragging === t.id ? 'dragging' : ''}`} draggable
+                  onDragStart={e => { e.dataTransfer.setData('text', t.id); e.dataTransfer.effectAllowed = 'move'; setTimeout(() => setDragging(t.id)) }}
+                  onDragEnd={() => { setDragging(null); setOver(null) }}>
+                  <button className="task-del" aria-label="Eliminar tarea" onClick={() => setTasks(ts => ts.filter(x => x.id !== t.id))}>×</button>
                   <p>{t.col === 'done' && '✓ '}{t.title}</p>
                   <div className="task-foot">
                     <span className={`who bg-${p.color}`} title={p.denominacion}>{p.icon} {ROLE_SHORT[p.clave]}</span>
-                    <span>
-                      <button aria-label="Mover a la izquierda" onClick={() => shift(t, -1)}>←</button>
-                      <button aria-label="Mover a la derecha" onClick={() => shift(t, 1)}>→</button>
-                      <button aria-label="Eliminar" onClick={() => setTasks(ts => ts.filter(x => x.id !== t.id))}>×</button>
-                    </span>
                   </div>
                 </div>
                 )
@@ -588,7 +587,7 @@ export function Scrum() {
       <Hero tint="yellow" eyebrow="Scrum" title="Entregas cortas, mejora constante"
         sub="Marco ágil que usamos en proyectos de red: sprints de 2 semanas con valor visible en cada entrega." />
       <section className="wrap">
-        <Head kicker="Tablero Kanban · Departamento de Redes" title="Sprint 4 en curso" sub="Tareas asignadas a cada puesto del organigrama. Arrastra las tarjetas entre columnas o usa las flechas; los cambios se guardan en tu navegador." />
+        <Head kicker="Tablero Kanban · Departamento de Redes" title="Sprint 4 en curso" sub="Tareas asignadas a cada puesto del organigrama. Arrastra las tarjetas entre columnas; los cambios se guardan en tu navegador." />
         <Kanban />
       </section>
       <section className="wrap">

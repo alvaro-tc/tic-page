@@ -25,7 +25,7 @@ export const PUESTOS = [
   },
   {
     clave: 'administrador', codigo: 'TIC-RED-002', denominacion: 'Administrador de Redes', categoria: 'Profesional / Técnico especializado', color: 'blue', icon: '⇄',
-    person: 'Sofía Vargas', mbti: 'ISTJ', alias: 'La Logista',
+    person: 'Alvaro Ariel Torrez Calle', mbti: 'ISTJ', alias: 'La Logista',
     perfil: 'Metódica y confiable. Mantiene la red documentada, estandarizada y estable; prefiere cambios planificados con ventana de mantenimiento y plan de reversa.',
     fortalezas: ['Documentación y control de cambios rigurosos', 'Cumple SLA y procedimientos al detalle', 'Diagnóstico sistemático de fallas'],
     retos: ['Resistencia a cambios no planificados', 'Puede priorizar el proceso sobre la urgencia'],
@@ -44,7 +44,7 @@ export const PUESTOS = [
   },
   {
     clave: 'seguridad', codigo: 'TIC-RED-003', denominacion: 'Especialista en Seguridad de Redes', categoria: 'Profesional / Técnico especializado', color: 'pink', icon: '⛨',
-    person: 'Javier Soto', mbti: 'INTJ', alias: 'El Arquitecto',
+    person: 'Rodny Gerald Siles Barrenechea', mbti: 'INTJ', alias: 'El Arquitecto',
     perfil: 'Estratega analítico que piensa en escenarios de ataque antes de que ocurran. Diseña defensas en capas y cuestiona supuestos con argumentos técnicos.',
     fortalezas: ['Visión a largo plazo (Zero Trust, segmentación)', 'Análisis de riesgos y amenazas', 'Autonomía para investigar incidentes'],
     retos: ['Puede parecer distante o demasiado crítico', 'Poca paciencia con decisiones sin fundamento'],
@@ -63,7 +63,7 @@ export const PUESTOS = [
   },
   {
     clave: 'soporte', codigo: 'TIC-RED-004', denominacion: 'Soporte y Monitoreo de Redes', categoria: 'Técnico / Operativo', color: 'green', icon: '◷',
-    person: 'Pablo Rojas', mbti: 'ISTP', alias: 'El Virtuoso',
+    person: 'Luis Angel Paredes Torrez', mbti: 'ISTP', alias: 'El Virtuoso',
     perfil: 'Práctico y sereno bajo presión. Brilla resolviendo incidentes en vivo, con las manos en el equipo y la consola, adaptándose rápido a lo inesperado.',
     fortalezas: ['Respuesta rápida ante caídas', 'Resolución práctica en sitio', 'Calma en situaciones críticas'],
     retos: ['Tiende a postergar reportes y documentación', 'Se desmotiva con tareas repetitivas'],
