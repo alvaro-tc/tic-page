@@ -279,14 +279,8 @@ export function OrgChart() {
 
   return (
     <>
-      <Hero tint="peach" eyebrow="Organigrama" title="Departamento de Redes" sub="Estructura del área según el manual de funciones. Haz clic en un puesto para ver su descripción oficial." />
-      <section className="wrap">
-        <div className="grid g4 kpis">
-          {[['Puestos documentados', PUESTOS.length, 'yellow'], ['Niveles jerárquicos', 3, 'green'], ['Personas a cargo del coordinador', team.length, 'blue'], ['Edición del manual', 'Ago 2026', 'pink']].map(([l, v, c]) => (
-            <div key={l} className={`card sm bg-${c}`}><strong className="num">{v}</strong><small>{l}</small></div>
-          ))}
-        </div>
-        <div className="tree-scroll">
+      <Hero tint="peach" eyebrow="Organigrama" title="Departamento de Redes" sub="Haz clic en un puesto para ver su descripción oficial.">
+        <div className="tree-scroll org-top">
           <ul className="tree org">
             <li>
               <span className="node wide ghost"><span><b>Dirección de Tecnología y Producto</b><small>Nivel directivo</small></span></span>
@@ -295,6 +289,19 @@ export function OrgChart() {
           </ul>
         </div>
         <p className="muted hint">¿Todo junto? <a href={`${DOCS}manual-de-funciones.pdf`} target="_blank" rel="noopener">Descargar el manual de funciones (PDF)</a></p>
+      </Hero>
+      <section className="wrap">
+        <Head kicker="Sobre el organigrama" title="Cómo está organizada el área" />
+        <div className="grid g4">
+          {[
+            ['Tipo de estructura', 'Vertical, jerárquica y funcional: cada puesto agrupa una especialidad técnica bajo una sola coordinación.', 'yellow'],
+            ['3 niveles', 'Dirección de Tecnología y Producto → Coordinación de Redes (Scrum Master) → equipo técnico.', 'green'],
+            [`Tramo de control: ${team.length}`, 'El coordinador supervisa directamente a administración, seguridad y soporte, lo que permite comunicación ágil y sin intermediarios.', 'blue'],
+            ['Relaciones funcionales', 'Coordinación horizontal entre los tres roles técnicos y con Infraestructura, Desarrollo, auditoría interna y proveedores de telecomunicaciones.', 'pink'],
+          ].map(([t, d, c]) => (
+            <article key={t} className={`card bg-${c}`}><h3>{t}</h3><p>{d}</p></article>
+          ))}
+        </div>
       </section>
       <dialog ref={dialog} className="doc" aria-label={p?.denominacion} onClose={() => setOpen(null)}
         onClick={e => e.target === e.currentTarget && setOpen(null)}>
@@ -313,39 +320,88 @@ export function OrgChart() {
 
 /* ---------- 6. Descripción de posiciones ---------- */
 
+const List = ({ items }) => <ul>{items.map(x => <li key={x}>{x}</li>)}</ul>
+
+function Manual({ p }) {
+  const sections = [
+    ['Propósito del puesto', <p>{p.proposito}</p>],
+    ['Ubicación en la estructura', <table><tbody>
+      <tr><th>Reporta a</th><td>{p.reportaA}</td></tr>
+      <tr><th>Supervisa a</th><td>{p.supervisa.length ? p.supervisa.join(' · ') : 'No tiene personal a cargo'}</td></tr>
+      <tr><th>Relaciones funcionales</th><td>{p.funcionales}</td></tr>
+    </tbody></table>],
+    ['Funciones principales', <ol>{p.funciones.map(x => <li key={x}>{x}</li>)}</ol>],
+    ['Responsabilidades', <List items={p.responsabilidades} />],
+    ['Nivel de autoridad', <List items={p.autoridad} />],
+    ['Perfil requerido', <><List items={p.requisitos} /><div className="chips">{p.competencias.map(c => <span key={c} className={`bg-${p.color}`}>{c}</span>)}</div></>],
+    ['Indicadores de desempeño', <table><thead><tr><th>Indicador</th><th>Meta</th></tr></thead><tbody>
+      {p.indicadores.map(([k, v]) => <tr key={k}><td>{k}</td><td><b>{v}</b></td></tr>)}
+    </tbody></table>],
+    ['Condiciones y riesgos', <div className="grid g2"><div><h4>Condiciones de trabajo</h4><List items={p.condiciones} /></div><div><h4>Riesgos laborales</h4><List items={p.riesgos} /></div></div>],
+  ]
+  return (
+    <article className="manual">
+      <header className={`bg-${p.color}`}>
+        <small>IATECH · Manual institucional de puestos · Departamento de Redes</small>
+        <h2>{p.denominacion}</h2>
+        <p>{p.subtitulo}</p>
+        <dl>
+          <div><dt>Código</dt><dd>{p.codigo}</dd></div>
+          <div><dt>Categoría</dt><dd>{p.categoria}</dd></div>
+          <div><dt>Nivel</dt><dd>{p.nivel}</dd></div>
+          <div><dt>Versión</dt><dd>1.0 · Agosto 2026</dd></div>
+        </dl>
+      </header>
+      {sections.map(([t, body], i) => <section key={t}><h3><i>{i + 1}</i>{t}</h3>{body}</section>)}
+      <footer>
+        <span>Elaborado por<b>Coordinación de Redes</b></span>
+        <span>Revisado por<b>Talento Humano</b></span>
+        <span>Aprobado por<b>Dirección de Tecnología y Producto</b></span>
+      </footer>
+    </article>
+  )
+}
+
 export function Positions() {
-  const [open, setOpen] = useState('ceo')
+  const [open, setOpen] = useState(null)
+  const dialog = useRef(null)
+  const p = PUESTOS.find(x => x.clave === open)
+
+  useEffect(() => {
+    const d = dialog.current
+    if (open && !d.open) d.showModal()
+    if (!open && d.open) d.close()
+  }, [open])
+
   return (
     <>
-      <Hero tint="pink" eyebrow="Descripción de posiciones" title="Cada rol, con propósito" sub="Responsabilidades, requisitos y línea de reporte de cada puesto del organigrama." />
-      <section className="wrap narrow">
-        {POSITIONS.map(p => {
-          const boss = POSITIONS.find(x => x.id === p.reportsTo)
-          const isOpen = open === p.id
-          return (
-            <article key={p.id} className={`acc ${isOpen ? 'open' : ''}`}>
-              <button className="acc-head" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? null : p.id)}>
-                <Avatar p={p} size={44} />
-                <span><b>{p.title}</b><small>{p.area} · {p.person}</small></span>
-                <i aria-hidden="true">{isOpen ? '−' : '+'}</i>
-              </button>
-              {isOpen && (
-                <div className="acc-body">
-                  <p>{p.summary}</p>
-                  <div className="grid g3">
-                    <div className={`card sm bg-${p.color}`}><h4>Responsabilidades</h4><ul>{p.duties.map(d => <li key={d}>{d}</li>)}</ul></div>
-                    <div className="card sm bg-soft"><h4>Requisitos</h4><ul>{p.reqs.map(d => <li key={d}>{d}</li>)}</ul></div>
-                    <div className="card sm bg-soft"><h4>Relaciones</h4><ul>
-                      <li>Reporta a: {boss ? boss.title : 'Directorio'}</li>
-                      {POSITIONS.filter(k => k.reportsTo === p.id).map(k => <li key={k.id}>Supervisa: {k.title}</li>)}
-                    </ul></div>
-                  </div>
-                </div>
-              )}
-            </article>
-          )
-        })}
+      <Hero tint="pink" eyebrow="Descripción de posiciones" title="Cada rol, con propósito" sub="Todas las posiciones del Departamento de Redes. Selecciona un puesto para abrir su manual institucional." />
+      <section className="wrap">
+        <Head kicker={`${PUESTOS.length} posiciones`} title="Puestos del organigrama" />
+        <div className="grid g4">
+          {PUESTOS.map(x => (
+            <button key={x.clave} className={`card pos bg-${x.color}`} onClick={() => setOpen(x.clave)} aria-haspopup="dialog">
+              <span className="icon" aria-hidden="true">{x.icon}</span>
+              <small>{x.codigo} · {x.nivel}</small>
+              <h3>{x.denominacion}</h3>
+              <p>{x.proposito}</p>
+              <span className="pos-foot">Reporta a: {x.reportaA}</span>
+              <span className="pos-link">Ver manual →</span>
+            </button>
+          ))}
+        </div>
       </section>
+      <dialog ref={dialog} className="doc" aria-label={p && `Manual: ${p.denominacion}`} onClose={() => setOpen(null)}
+        onClick={e => e.target === e.currentTarget && setOpen(null)}>
+        {p && <>
+          <header>
+            <span><b>Manual institucional</b><small>{p.codigo} · {p.denominacion}</small></span>
+            <button className="btn outline" onClick={() => window.print()}>Imprimir</button>
+            <button className="btn dark" onClick={() => setOpen(null)} aria-label="Cerrar">✕</button>
+          </header>
+          <div className="doc-body"><Manual p={p} /></div>
+        </>}
+      </dialog>
     </>
   )
 }
@@ -372,6 +428,41 @@ export function Mbti() {
       <Hero tint="lilac" eyebrow="MBTI" title="Conocernos para trabajar mejor"
         sub="El Myers-Briggs Type Indicator describe preferencias de personalidad en 4 dimensiones que combinan 16 tipos." />
       <section className="wrap">
+        <Head kicker="Departamento de Redes" title="Nuestro equipo" sub="Perfiles de cada integrante del organigrama. Usamos MBTI para mejorar la comunicación, nunca para seleccionar ni descartar personas." />
+        <div className="grid g2">
+          {PUESTOS.map(p => {
+            const g = groupOf(p.mbti)
+            return (
+              <article key={p.clave} className="card white">
+                <div className="row">
+                  <Avatar p={p} size={52} />
+                  <span className="grow"><b>{p.person}</b><small className="muted">{p.denominacion}</small></span>
+                  <span className={`tag bg-${g[1]}`}>{p.mbti}</span>
+                </div>
+                <div className="letters">
+                  {[...p.mbti].map((l, i) => {
+                    const d = DICHOTOMIES[i]
+                    return <span key={i} className={`bg-${d[5]}`}><b>{l}</b>{l === d[0] ? d[1] : d[3]}</span>
+                  })}
+                </div>
+                <h4>{p.alias} · <span className="muted">{g[0]}</span></h4>
+                <p>{p.perfil}</p>
+                <div className="grid g2 profile">
+                  <div><h4>Fortalezas</h4><ul>{p.fortalezas.map(x => <li key={x}>{x}</li>)}</ul></div>
+                  <div><h4>Retos</h4><ul>{p.retos.map(x => <li key={x}>{x}</li>)}</ul></div>
+                </div>
+                <p className={`card sm bg-${p.color}`}><b>Cómo comunicarte:</b> {p.comunicacion}</p>
+              </article>
+            )
+          })}
+        </div>
+        <div className="grid g3 tips">
+          {[['Comunicación', 'Tres de cuatro son introvertidos (I): agenda y contexto por escrito antes de las reuniones.', 'blue'], ['Decisiones', 'Predomina el pensamiento (T); el coordinador (F) aporta la mirada del impacto en las personas.', 'pink'], ['Proyectos', 'Perfiles J planifican el sprint; el perfil P de soporte aporta flexibilidad ante incidentes.', 'yellow']].map(([t, d, c]) => (
+            <div key={t} className={`card sm bg-${c}`}><h4>{t}</h4><p>{d}</p></div>
+          ))}
+        </div>
+      </section>
+      <section className="wrap">
         <Head kicker="¿Qué es?" title="Las 4 dimensiones" sub="Nadie es 100% de un polo: son preferencias, no capacidades." />
         <div className="grid g4">
           {DICHOTOMIES.map(([a, an, b, bn, q, c]) => (
@@ -393,26 +484,6 @@ export function Mbti() {
           ))}
         </div>
       </section>
-      <section className="wrap">
-        <Head kicker="Aplicación en IATECH" title="Perfiles del equipo" sub="Usamos MBTI para mejorar la comunicación y armar equipos equilibrados, nunca para seleccionar ni descartar personas." />
-        <div className="grid g3">
-          {POSITIONS.map(p => {
-            const g = groupOf(p.mbti)
-            return (
-              <div key={p.id} className="card white row">
-                <Avatar p={p} size={44} />
-                <span className="grow"><b>{p.person}</b><small className="muted">{p.title}</small></span>
-                <span className={`tag bg-${g[1]}`}>{p.mbti}</span>
-              </div>
-            )
-          })}
-        </div>
-        <div className="grid g3 tips">
-          {[['Comunicación', 'Introvertidos: agenda y contexto por escrito antes de las reuniones.', 'blue'], ['Decisiones', 'Combina perfiles T (datos) y F (impacto en personas) en los comités.', 'pink'], ['Proyectos', 'Perfiles J planifican el sprint; perfiles P aportan flexibilidad ante incidentes.', 'yellow']].map(([t, d, c]) => (
-            <div key={t} className={`card sm bg-${c}`}><h4>{t}</h4><p>{d}</p></div>
-          ))}
-        </div>
-      </section>
     </>
   )
 }
@@ -420,22 +491,38 @@ export function Mbti() {
 /* ---------- 8. Scrum + Kanban ---------- */
 
 const COLUMNS = [['backlog', 'Backlog', 'lilac'], ['todo', 'Por hacer', 'blue'], ['doing', 'En progreso', 'yellow'], ['review', 'Revisión', 'pink'], ['done', 'Hecho', 'green']]
+// Tareas del sprint repartidas según los puestos del organigrama (PUESTOS)
+const ROLE_SHORT = { coordinador: 'Coordinación', administrador: 'Administración', seguridad: 'Seguridad', soporte: 'Soporte' }
 const INITIAL_TASKS = [
-  { id: 1, title: 'Levantamiento de red sucursal Norte', col: 'backlog', who: 'SV' },
-  { id: 2, title: 'Configurar VLANs de invitados', col: 'todo', who: 'PR' },
-  { id: 3, title: 'Política ZTNA para VPN', col: 'doing', who: 'JS' },
-  { id: 4, title: 'Dashboard Grafana de enlaces WAN', col: 'review', who: 'MC' },
-  { id: 5, title: 'Actualizar firmware de switches core', col: 'done', who: 'PR' },
-]
+  ['Sprint Planning y objetivo del Sprint 4', 'done', 'coordinador'],
+  ['Cerrar acciones de la retrospectiva del Sprint 3', 'done', 'coordinador'],
+  ['Actualizar firmware de switches core', 'done', 'administrador'],
+  ['Respaldo automático de configuraciones con Ansible', 'done', 'administrador'],
+  ['Hardening de routers de borde', 'done', 'seguridad'],
+  ['Alertas de latencia y caída de enlaces en Zabbix', 'done', 'soporte'],
+  ['Aprobar ventana de mantenimiento del core', 'review', 'coordinador'],
+  ['Dashboard Grafana de enlaces WAN', 'review', 'soporte'],
+  ['Configurar VLAN de invitados', 'doing', 'administrador'],
+  ['Autenticación 802.1X en red cableada', 'doing', 'seguridad'],
+  ['Escaneo de vulnerabilidades trimestral', 'todo', 'seguridad'],
+  ['Actualizar base de conocimiento de soporte N1', 'todo', 'soporte'],
+  ['Remover impedimento: demora del proveedor de enlace', 'todo', 'coordinador'],
+  ['Rediseñar direccionamiento de la sucursal Norte', 'backlog', 'administrador'],
+  ['Simulacro de respuesta a incidentes', 'backlog', 'seguridad'],
+  ['Inventario físico de gabinetes y cableado', 'backlog', 'soporte'],
+].map(([title, col, who], i) => ({ id: i + 1, title, col, who }))
 
 function Kanban() {
   const [tasks, setTasks] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('iatech-kanban')) || INITIAL_TASKS } catch { return INITIAL_TASKS }
+    try { return JSON.parse(localStorage.getItem('iatech-kanban-v2')) || INITIAL_TASKS } catch { return INITIAL_TASKS }
   })
   const [text, setText] = useState('')
+  const [role, setRole] = useState('coordinador')
   const [over, setOver] = useState(null)
+  const done = tasks.filter(t => t.col === 'done').length
+  const pct = tasks.length ? Math.round(done / tasks.length * 100) : 0
 
-  useEffect(() => { try { localStorage.setItem('iatech-kanban', JSON.stringify(tasks)) } catch { /* storage blocked */ } }, [tasks])
+  useEffect(() => { try { localStorage.setItem('iatech-kanban-v2', JSON.stringify(tasks)) } catch { /* storage blocked */ } }, [tasks])
 
   const move = (id, col) => setTasks(ts => ts.map(t => t.id === id ? { ...t, col } : t))
   const shift = (t, dir) => {
@@ -445,14 +532,21 @@ function Kanban() {
   const add = e => {
     e.preventDefault()
     if (!text.trim()) return
-    setTasks(ts => [...ts, { id: Date.now(), title: text.trim(), col: 'backlog', who: 'IA' }])
+    setTasks(ts => [...ts, { id: Date.now(), title: text.trim(), col: 'backlog', who: role }])
     setText('')
   }
 
   return (
     <>
+      <div className="goal">
+        <div className="goal-line"><b>Avance del sprint</b><span>{done} de {tasks.length} tareas hechas · {pct}%</span></div>
+        <div className="bar"><span className="bg-green" style={{ width: `${pct}%` }} /></div>
+      </div>
       <form className="add" onSubmit={add}>
         <input value={text} onChange={e => setText(e.target.value)} placeholder="Nueva tarea para el backlog…" aria-label="Nueva tarea" />
+        <select value={role} onChange={e => setRole(e.target.value)} aria-label="Responsable">
+          {PUESTOS.map(p => <option key={p.clave} value={p.clave}>{ROLE_SHORT[p.clave]}</option>)}
+        </select>
         <button className="btn dark">Agregar</button>
         <button type="button" className="btn outline" onClick={() => setTasks(INITIAL_TASKS)}>Reiniciar</button>
       </form>
@@ -464,11 +558,13 @@ function Kanban() {
               onDragOver={e => { e.preventDefault(); setOver(id) }} onDragLeave={() => setOver(null)}
               onDrop={e => { move(Number(e.dataTransfer.getData('text')), id); setOver(null) }}>
               <h4>{name} <span>{list.length}</span></h4>
-              {list.map(t => (
-                <div key={t.id} className="task" draggable onDragStart={e => e.dataTransfer.setData('text', t.id)}>
-                  <p>{t.title}</p>
+              {list.map(t => {
+                const p = PUESTOS.find(x => x.clave === t.who) ?? PUESTOS[0]
+                return (
+                <div key={t.id} className={`task ${t.col === 'done' ? 'done' : ''}`} draggable onDragStart={e => e.dataTransfer.setData('text', t.id)}>
+                  <p>{t.col === 'done' && '✓ '}{t.title}</p>
                   <div className="task-foot">
-                    <span className="who">{t.who}</span>
+                    <span className={`who bg-${p.color}`} title={p.denominacion}>{p.icon} {ROLE_SHORT[p.clave]}</span>
                     <span>
                       <button aria-label="Mover a la izquierda" onClick={() => shift(t, -1)}>←</button>
                       <button aria-label="Mover a la derecha" onClick={() => shift(t, 1)}>→</button>
@@ -476,7 +572,8 @@ function Kanban() {
                     </span>
                   </div>
                 </div>
-              ))}
+                )
+              })}
             </div>
           )
         })}
@@ -491,6 +588,10 @@ export function Scrum() {
       <Hero tint="yellow" eyebrow="Scrum" title="Entregas cortas, mejora constante"
         sub="Marco ágil que usamos en proyectos de red: sprints de 2 semanas con valor visible en cada entrega." />
       <section className="wrap">
+        <Head kicker="Tablero Kanban · Departamento de Redes" title="Sprint 4 en curso" sub="Tareas asignadas a cada puesto del organigrama. Arrastra las tarjetas entre columnas o usa las flechas; los cambios se guardan en tu navegador." />
+        <Kanban />
+      </section>
+      <section className="wrap">
         <div className="grid g3">
           <article className="card bg-blue"><span className="eyebrow">Roles</span><ul className="clean"><li><b>Product Owner</b> prioriza el valor</li><li><b>Scrum Master</b> facilita y remueve impedimentos</li><li><b>Developers</b> construyen el incremento</li></ul></article>
           <article className="card bg-green"><span className="eyebrow">Eventos</span><ul className="clean"><li><b>Sprint</b> 2 semanas</li><li><b>Planning</b> qué y cómo</li><li><b>Daily</b> 15 minutos</li><li><b>Review</b> y <b>Retrospectiva</b></li></ul></article>
@@ -502,10 +603,6 @@ export function Scrum() {
         <div>
           <Head kicker="Valores Scrum" title="Compromiso, foco, apertura, respeto y coraje" sub="Scrum define el ritmo; Kanban hace visible el flujo de trabajo." />
         </div>
-      </section>
-      <section className="wrap">
-        <Head kicker="Tablero Kanban" title="Sprint actual" sub="Arrastra las tarjetas entre columnas o usa las flechas. Los cambios se guardan en tu navegador." />
-        <Kanban />
       </section>
     </>
   )
