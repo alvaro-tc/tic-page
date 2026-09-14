@@ -10,7 +10,8 @@ const PAGES = [
   ['posiciones', 'Posiciones', P.Positions],
   ['mbti', 'MBTI', P.Mbti],
   ['scrum', 'Scrum', P.Scrum],
-  ['goals', 'Goals', P.Goals],
+  ['bpmn', 'BPMN', P.Bpmn],
+  ['objetivos', 'Objetivos', P.Goals],
 ]
 
 export function Logo() {
@@ -45,7 +46,6 @@ export default function App() {
             <a key={id} href={`#${id}`} className={id === page ? 'active' : ''} aria-current={id === page ? 'page' : undefined}>{label}</a>
           ))}
         </nav>
-        <a href="#mision" className="btn dark">Conócenos</a>
       </header>
       <main><Current /></main>
       <footer className="foot">

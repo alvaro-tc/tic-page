@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { PUESTOS, VIDEOS, img } from './data.js'
+import DIAGRAM_URL from '../docs/bpmn/gestion-incidentes-red_1.bpmn?url'
 
 /* ---------- shared bits ---------- */
 
@@ -25,9 +26,13 @@ const Head = ({ kicker, title, sub }) => (
 // nombre + primer apellido: "Alvaro Ariel Torrez Calle" → "AT"
 const initials = name => { const w = name.split(' '); return w[0][0] + w[Math.max(1, w.length - 2)][0] }
 
-const Avatar = ({ p, size = 48 }) => p.photo
-  ? <img className="avatar" src={img(p.photo, 200)} alt={p.person} width={size} height={size} />
-  : <span className={`avatar initials bg-${p.color}`} style={{ width: size, height: size }}>{initials(p.person)}</span>
+const FOTOS = `${import.meta.env.BASE_URL}img/fotos/`
+
+const Avatar = ({ p, size = 48 }) => p.foto
+  ? <img className="avatar" src={`${FOTOS}${p.foto}`} alt={p.person} width={size} height={size} />
+  : p.photo
+    ? <img className="avatar" src={img(p.photo, 200)} alt={p.person} width={size} height={size} />
+    : <span className={`avatar initials bg-${p.color}`} style={{ width: size, height: size }}>{initials(p.person)}</span>
 
 const Video = ({ id, title }) => (
   <div className="video">
@@ -36,11 +41,6 @@ const Video = ({ id, title }) => (
   </div>
 )
 
-const Bar = ({ value, color }) => (
-  <div className="bar" role="progressbar" aria-valuenow={value} aria-valuemin="0" aria-valuemax="100">
-    <span className={`bg-${color}-strong`} style={{ width: `${value}%` }} />
-  </div>
-)
 
 /* ---------- 1. Inicio ---------- */
 
@@ -226,30 +226,73 @@ export function Science() {
 /* ---------- 4. Misión y visión ---------- */
 
 export function Mission() {
-  const block = (who, mission, vision, c1, c2) => (
+  // primera oración destacada, el resto como cuerpo
+  const card = (label, when, icon, text, keys, c) => {
+    const [first, ...rest] = text.split(/(?<=\.)\s/)
+    return (
+      <article className={`card mv-card bg-${c}`}>
+        <div className="row"><span className="icon">{icon}</span><span className="grow"><b>{label}</b><small>{when}</small></span></div>
+        <p className="mv-lead">{first}</p>
+        <p>{rest.join(' ')}</p>
+        <div className="chips">{keys.map(k => <span key={k} className="chip">{k}</span>)}</div>
+      </article>
+    )
+  }
+  const block = (kicker, title, icon, mission, vision) => (
     <section className="wrap">
-      <Head kicker={who} title={who === 'IATECH' ? 'La empresa' : 'Área de redes'} />
-      <div className="grid g2">
-        <article className={`card big bg-${c1}`}><span className="eyebrow">Misión</span><p className="quote">{mission}</p></article>
-        <article className={`card big bg-${c2}`}><span className="eyebrow">Visión</span><p className="quote">{vision}</p></article>
+      <div className="mv">
+        <div className="mv-head"><span className="icon">{icon}</span><div><span className="eyebrow">{kicker}</span><h2>{title}</h2></div></div>
+        <div className="grid g2">
+          {card('Misión', 'Lo que hacemos hoy', '◎', ...mission)}
+          {card('Visión', 'A dónde queremos llegar', '➚', ...vision)}
+        </div>
       </div>
     </section>
   )
   return (
     <>
-      <Hero tint="green" eyebrow="Misión y visión" title="Conectamos personas, datos y oportunidades" />
-      {block('IATECH',
-        'Nuestra misión es transformar la prestación de servicios médicos mediante el desarrollo de soluciones de software innovadoras que prioricen los resultados (outcomes) sobre los simples entregables. Nos comprometemos a actuar como administradores (stewards) diligentes y éticos, garantizando la integridad de los datos de salud y el cumplimiento riguroso de las normativas de seguridad, para entregar un valor tangible que mejore la calidad de vida de los pacientes y la eficiencia de los profesionales médicos.',
-        'Consolidarnos como un sistema de entrega de valor líder en el sector salud global, capaz de navegar la complejidad y la incertidumbre tecnológica con adaptabilidad y resiliencia. Aspiramos a definir el futuro de la tecnología médica, integrando enfoques de desarrollo híbridos que aseguren la calidad total y permitan a las instituciones de salud alcanzar su estado futuro deseado a través de la mejora continua y el aprendizaje organizacional.',
-        'yellow', 'blue')}
-      {block('Redes',
-        'Asegurar una infraestructura de conectividad clínica altamente segura, robusta y permanente que actúe como un administrador responsable (steward) en la protección y transmisión de los datos médicos de nuestros interesados. Nos comprometemos a diseñar y operar redes de telecomunicaciones bajo los más estrictos estándares de calidad, confiabilidad y resiliencia ante fallas, garantizando que cada componente de conectividad interactúe de forma armónica para maximizar la disponibilidad y la entrega de valor real en el cuidado de los pacientes.',
-        'Ser reconocidos como el estándar en conectividad y telecomunicaciones para el sector de salud digital, liderando la adopción de redes inteligentes capaces de navegar la complejidad de entornos hospitalarios distribuidos y cambiantes. Aspiramos a consolidar una arquitectura de red proactiva que optimice constantemente la respuesta ante riesgos y amenazas de seguridad, adoptando un enfoque de pensamiento sistémico y una cultura de adaptabilidad tecnológica para facilitar las innovaciones clínicas del futuro de forma ininterrumpida.',
-        'green', 'pink')}
+      <Hero tint="green" eyebrow="Misión y visión" title="Conectamos personas, datos y oportunidades"
+        sub="La misión es quiénes somos hoy; la visión, a dónde queremos llegar." />
+      {block('IATECH', 'La empresa', '▦',
+        ['Nuestra misión es transformar la prestación de servicios médicos mediante el desarrollo de soluciones de software innovadoras que prioricen los resultados (outcomes) sobre los simples entregables. Nos comprometemos a actuar como administradores (stewards) diligentes y éticos, garantizando la integridad de los datos de salud y el cumplimiento riguroso de las normativas de seguridad, para entregar un valor tangible que mejore la calidad de vida de los pacientes y la eficiencia de los profesionales médicos.',
+          ['Software médico', 'Ética', 'Datos de salud'], 'yellow'],
+        ['Consolidarnos como un sistema de entrega de valor líder en el sector salud global, capaz de navegar la complejidad y la incertidumbre tecnológica con adaptabilidad y resiliencia. Aspiramos a definir el futuro de la tecnología médica, integrando enfoques de desarrollo híbridos que aseguren la calidad total y permitan a las instituciones de salud alcanzar su estado futuro deseado a través de la mejora continua y el aprendizaje organizacional.',
+          ['Liderazgo global', 'Resiliencia', 'Mejora continua'], 'blue'])}
+      {block('Departamento de Redes', 'Área de redes', '⇄',
+        ['Asegurar una infraestructura de conectividad clínica altamente segura, robusta y permanente que actúe como un administrador responsable (steward) en la protección y transmisión de los datos médicos de nuestros interesados. Nos comprometemos a diseñar y operar redes de telecomunicaciones bajo los más estrictos estándares de calidad, confiabilidad y resiliencia ante fallas, garantizando que cada componente de conectividad interactúe de forma armónica para maximizar la disponibilidad y la entrega de valor real en el cuidado de los pacientes.',
+          ['Conectividad clínica', 'Seguridad', 'Disponibilidad'], 'green'],
+        ['Ser reconocidos como el estándar en conectividad y telecomunicaciones para el sector de salud digital, liderando la adopción de redes inteligentes capaces de navegar la complejidad de entornos hospitalarios distribuidos y cambiantes. Aspiramos a consolidar una arquitectura de red proactiva que optimice constantemente la respuesta ante riesgos y amenazas de seguridad, adoptando un enfoque de pensamiento sistémico y una cultura de adaptabilidad tecnológica para facilitar las innovaciones clínicas del futuro de forma ininterrumpida.',
+          ['Redes inteligentes', 'Proactividad', 'Innovación clínica'], 'pink'])}
       <section className="wrap">
         <Head kicker="Valores" title="Lo que nos guía" />
         <div className="values">
           {[['Integridad', 'yellow'], ['Innovación', 'lilac'], ['Seguridad', 'pink'], ['Trabajo en equipo', 'green'], ['Orientación al cliente', 'blue'], ['Mejora continua', 'peach']].map(([v, c]) => <span key={v} className={`bg-${c}`}>{v}</span>)}
+        </div>
+      </section>
+      <section className="wrap split">
+        <div>
+          <Head kicker="Cómo se construyen" title="Del taller a la declaración" />
+          <ol className="steps">
+            {['Analizar el propósito, clientes y entorno (FODA)', 'Responder las preguntas clave en equipo', 'Redactar borradores breves y claros', 'Validar con los interesados y ajustar', 'Comunicar y revisar cada año'].map(s => <li key={s}>{s}</li>)}
+          </ol>
+        </div>
+        <img className="photo" src={img('1552664730-d307ca884978')} alt="Equipo en un taller frente a una pizarra" />
+      </section>
+      <section className="wrap">
+        <div className="grid g2">
+          <article className="card bg-yellow"><span className="icon">◎</span><h3>Misión: el presente</h3>
+            <ul>{['¿Qué hacemos?', '¿Para quién lo hacemos?', '¿Cómo lo hacemos?', '¿Qué valor aportamos?'].map(q => <li key={q}>{q}</li>)}</ul>
+          </article>
+          <article className="card bg-blue"><span className="icon">➚</span><h3>Visión: el futuro</h3>
+            <ul>{['¿Qué queremos llegar a ser?', '¿En qué plazo (3–5 años)?', '¿Dónde queremos ser referentes?', '¿Inspira y es alcanzable?'].map(q => <li key={q}>{q}</li>)}</ul>
+          </article>
+        </div>
+      </section>
+      <section className="wrap">
+        <Head kicker="Videos" title="Aprende a redactarlas" />
+        <div className="grid g2">
+          <Video id="d-IqjXIgyJg" title="Cómo hacer una Misión" />
+          <Video id="Lk6OfqndH1k" title="Cómo hacer una Visión" />
         </div>
       </section>
     </>
@@ -346,8 +389,10 @@ function Manual({ p }) {
     <article className="manual">
       <header className={`bg-${p.color}`}>
         <small>IATECH · Manual institucional de puestos · Departamento de Redes</small>
-        <h2>{p.denominacion}</h2>
-        <p>{p.subtitulo}</p>
+        <div className="row">
+          <Avatar p={p} size={64} />
+          <span><h2>{p.denominacion}</h2><p>{p.subtitulo}</p></span>
+        </div>
         <dl>
           <div><dt>Código</dt><dd>{p.codigo}</dd></div>
           <div><dt>Categoría</dt><dd>{p.categoria}</dd></div>
@@ -384,7 +429,7 @@ export function Positions() {
         <div className="grid g4">
           {PUESTOS.map(x => (
             <button key={x.clave} className={`card pos bg-${x.color}`} onClick={() => setOpen(x.clave)} aria-haspopup="dialog">
-              <span className="icon" aria-hidden="true">{x.icon}</span>
+              <Avatar p={x} size={56} />
               <small>{x.codigo} · {x.nivel}</small>
               <h3>{x.denominacion}</h3>
               <p>{x.proposito}</p>
@@ -607,17 +652,129 @@ export function Scrum() {
   )
 }
 
-/* ---------- 9. Goals ---------- */
+/* ---------- 9. BPMN ---------- */
 
-const COMPANY_GOALS = [
-  ['Disponibilidad de red', 'Mantener 99.95% en clientes con SLA', 80, 'green'],
-  ['Crecimiento', '+25% de facturación anual', 62, 'yellow'],
-  ['Transformación', '60% de clientes en SD-WAN', 45, 'blue'],
-  ['Talento', '100% del equipo técnico certificado', 55, 'pink'],
+const WIKI = 'https://upload.wikimedia.org/wikipedia/commons/'
+const BPMN_VIDEOS = [
+  { id: 'NIMRIVpyKIY', tag: '2 min', title: 'BPMN – Qué es y para qué sirve' },
+  { id: 'k8pqgMgKxmA', tag: 'Conceptos', title: '¿En qué consiste la notación BPMN 2.0?' },
+  { id: 'BbT0IN3y2V4', tag: 'Tutorial', title: 'Modela fácilmente tus procesos en BPMN 2.0' },
+  { id: '2lmRwrl7-MY', tag: 'Lógica', title: 'Entiende la lógica de los pasos de un proceso' },
+]
+const NOTATION = [
+  ['Eventos', '○', 'Círculos que marcan lo que ocurre: inicio (borde fino), intermedio (doble) y fin (borde grueso).', 'green'],
+  ['Actividades', '▭', 'Rectángulos redondeados con el trabajo a realizar: tareas de usuario, de servicio, manuales o de envío.', 'blue'],
+  ['Compuertas', '◇', 'Rombos donde el flujo se divide o se une según una decisión (exclusiva, paralela o inclusiva).', 'yellow'],
+  ['Flujos y carriles', '≡', 'Flechas que ordenan los pasos; pools y lanes indican qué participante o área es responsable.', 'pink'],
+]
+const LANES = [
+  ['Usuario', 'peach', ['Reporta el incidente de red', 'Recibe la notificación de cierre']],
+  ['Mesa de Ayuda', 'lilac', ['Registra el ticket', 'Clasifica y prioriza', '¿Es de red? Si no, escala a otra área', 'Cierra el ticket y notifica']],
+  ['Equipo de Redes', 'green', ['Diagnostica la falla', '¿En sitio? Programa visita y resuelve', 'Si no, resuelve de forma remota', 'Verifica el restablecimiento']],
 ]
 
-// avance actual de cada indicador del manual de puestos (mismo orden que p.indicadores)
-const PROGRESS = { coordinador: [92, 78, 85, 70], administrador: [100, 88, 90, 65], seguridad: [72, 60, 100, 45], soporte: [86, 95, 80, 90] }
+function BpmnDiagram() {
+  const box = useRef(null)
+  const viewer = useRef(null)
+  const [status, setStatus] = useState('Cargando diagrama…')
+
+  useEffect(() => {
+    let v, dead = false
+    // carga diferida: bpmn-js solo se descarga al abrir esta sección
+    Promise.all([import('bpmn-js/lib/NavigatedViewer'), fetch(DIAGRAM_URL).then(r => r.text()), import('bpmn-js/dist/assets/diagram-js.css'), import('bpmn-js/dist/assets/bpmn-js.css')])
+      .then(async ([{ default: Viewer }, xml]) => {
+        if (dead) return
+        v = viewer.current = new Viewer({ container: box.current })
+        await v.importXML(xml)
+        v.get('canvas').zoom('fit-viewport')
+        setStatus(null)
+      })
+      .catch(() => !dead && setStatus('No se pudo cargar el diagrama.'))
+    return () => { dead = true; v?.destroy() }
+  }, [])
+
+  const zoom = f => { const c = viewer.current?.get('canvas'); if (c) c.zoom(f ? c.zoom() * f : 'fit-viewport') }
+
+  return (
+    <div className="bpmn">
+      <div className="bpmn-tools">
+        <button className="btn outline" onClick={() => zoom(1.2)} aria-label="Acercar">+</button>
+        <button className="btn outline" onClick={() => zoom(1 / 1.2)} aria-label="Alejar">−</button>
+        <button className="btn outline" onClick={() => zoom()}>Ajustar</button>
+        <a className="btn outline" href={DIAGRAM_URL} download="gestion-incidentes-red.bpmn">Descargar .bpmn</a>
+      </div>
+      {status && <p className="bpmn-status muted">{status}</p>}
+      <div ref={box} className="bpmn-canvas" />
+    </div>
+  )
+}
+
+export function Bpmn() {
+  const [video, setVideo] = useState(BPMN_VIDEOS[0])
+  return (
+    <>
+      <Hero tint="blue" eyebrow="BPMN" title="Procesos que todos pueden leer"
+        sub="Business Process Model and Notation: el estándar para dibujar cómo fluye el trabajo entre personas, áreas y sistemas." />
+      <section className="wrap">
+        <Head kicker="Nuestro proceso" title="Gestión de incidentes de red" sub="Arrastra para moverte y usa Ctrl + rueda del ratón (o los botones) para hacer zoom." />
+        <BpmnDiagram />
+        <div className="grid g3 tips">
+          {LANES.map(([n, c, steps]) => (
+            <article key={n} className={`card sm bg-${c}`}><span className="eyebrow">Carril</span><h3>{n}</h3><ol className="lane-steps">{steps.map(s => <li key={s}>{s}</li>)}</ol></article>
+          ))}
+        </div>
+      </section>
+      <section className="wrap split">
+        <div>
+          <Head kicker="¿Qué es BPMN?" title="Un lenguaje común para los procesos" />
+          <p className="muted">BPMN es una notación gráfica estandarizada por el Object Management Group (OMG) e ISO/IEC 19510. La versión 2.0 define símbolos y reglas precisas para que analistas, técnicos y directivos entiendan el mismo diagrama sin ambigüedad, e incluso para que un motor de procesos pueda ejecutarlo.</p>
+        </div>
+        <ol className="steps">
+          {['Documenta cómo se trabaja hoy', 'Detecta cuellos de botella y responsables', 'Alinea a negocio y tecnología', 'Base para automatizar procesos'].map(s => <li key={s}>{s}</li>)}
+        </ol>
+      </section>
+      <section className="wrap">
+        <Head kicker="Notación" title="Los elementos básicos" />
+        <div className="grid g4">
+          {NOTATION.map(([t, i, d, c]) => (
+            <article key={t} className={`card bg-${c}`}><span className="icon">{i}</span><h3>{t}</h3><p>{d}</p></article>
+          ))}
+        </div>
+      </section>
+      <section className="wrap">
+        <Head kicker="Videos" title="Aprende BPMN en minutos" />
+        <div className="player">
+          <Video id={video.id} title={video.title} />
+          <ul className="playlist">
+            {BPMN_VIDEOS.map(v => (
+              <li key={v.id}><button className={v.id === video.id ? 'active' : ''} onClick={() => setVideo(v)}>
+                <img src={`https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`} alt="" /><span><small>{v.tag}</small>{v.title}</span>
+              </button></li>
+            ))}
+          </ul>
+        </div>
+      </section>
+      <section className="wrap">
+        <Head kicker="Galería" title="BPMN en imágenes" sub="Ejemplos de diagramas · Wikimedia Commons." />
+        <div className="gallery contain">
+          {[['9/98/Quotation_BPMN_Example2.png', 'Proceso de cotización'], ['9/90/A_simple_BPMN_diagram_that_depicts_the_interaction_between_two_parties.png', 'Colaboración entre dos participantes'], ['5/55/BPMN-Swimlanes.jpg', 'Pools y carriles']].map(([f, t]) => (
+            <figure key={f}><img src={WIKI + f} alt={`Diagrama BPMN: ${t}`} loading="lazy" /><figcaption>{t}</figcaption></figure>
+          ))}
+        </div>
+      </section>
+    </>
+  )
+}
+
+/* ---------- 10. Goals ---------- */
+
+// derivados de los objetivos, misión y visión de cada rol
+const COMPANY_GOALS = [
+  ['Entrega ágil de valor', 'Un equipo de Redes autoorganizado que cumple sus sprints alineado a las prioridades de la empresa.', 'yellow'],
+  ['Infraestructura escalable', 'Una red estable, documentada y automatizada, lista para crecer sin interrupciones.', 'blue'],
+  ['Seguridad Zero Trust', 'Detectar y contener amenazas a tiempo con una cultura de seguridad compartida.', 'pink'],
+  ['Servicio proactivo', 'Anticipar fallas y resolver incidentes antes de que afecten a los usuarios.', 'green'],
+]
 
 export function Goals() {
   const areas = ['Todas', ...new Set(PUESTOS.map(p => p.categoria))]
@@ -625,28 +782,28 @@ export function Goals() {
   const people = PUESTOS.filter(p => area === 'Todas' || p.categoria === area)
   return (
     <>
-      <Hero tint="green" eyebrow="Goals" title="Objetivos claros, responsables claros" sub="Metas de la empresa para este año y la asignación de objetivos personales." />
+      <Hero tint="green" eyebrow="Objetivos" title="Objetivos claros, responsables claros" sub="Objetivos estratégicos de la empresa y el objetivo, misión y visión de cada rol." />
       <section className="wrap">
         <Head kicker="Empresa" title="Objetivos estratégicos" />
         <div className="grid g4">
-          {COMPANY_GOALS.map(([t, d, v, c]) => (
+          {COMPANY_GOALS.map(([t, d, c], i) => (
             <article key={t} className={`card bg-${c}`}>
-              <strong className="num">{v}%</strong><h3>{t}</h3><p>{d}</p><Bar value={v} color={c} />
+              <strong className="num">0{i + 1}</strong><h3>{t}</h3><p>{d}</p>
             </article>
           ))}
         </div>
       </section>
       <section className="wrap">
-        <Head kicker="Asignación de personal" title="Objetivos personales" />
+        <Head kicker="Asignación de personal" title="Objetivo, misión y visión por rol" />
         <div className="pills">
           {areas.map(a => <button key={a} className={a === area ? 'active' : ''} onClick={() => setArea(a)}>{a}</button>)}
         </div>
         <div className="grid g2">
           {people.map(p => (
-            <article key={p.clave} className="card white">
+            <article key={p.clave} className={`card bg-${p.color}`}>
               <div className="row"><Avatar p={p} size={48} /><span className="grow"><b>{p.person}</b><small className="muted">{p.denominacion}</small></span></div>
-              {p.indicadores.map(([g, meta], i) => (
-                <div key={g} className="goal"><div className="goal-line"><span>{g} <small className="muted">· meta {meta}</small></span><b>{PROGRESS[p.clave][i]}%</b></div><Bar value={PROGRESS[p.clave][i]} color={p.color} /></div>
+              {[['Objetivo', p.objetivo], ['Misión', p.mision], ['Visión', p.vision]].map(([k, v]) => (
+                <div key={k} className="goal mvv"><span className="eyebrow">{k}</span><p>{v}</p></div>
               ))}
             </article>
           ))}

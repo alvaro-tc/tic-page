@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  id="Definitions_RedesIncidentes"
+                  targetNamespace="http://bpmn.io/schema/bpmn">
+
+  <bpmn:collaboration id="Collaboration_1">
+    <bpmn:participant id="Participant_1" name="Gestión de Incidentes de Red" processRef="Process_RedesIncidentes" />
+  </bpmn:collaboration>
+
+  <bpmn:process id="Process_RedesIncidentes" name="Gestión de Incidentes de Red" isExecutable="false">
+
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_Usuario" name="Usuario">
+        <bpmn:flowNodeRef>StartEvent_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_1</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_MesaAyuda" name="Mesa de Ayuda">
+        <bpmn:flowNodeRef>Task_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_3</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_9</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Redes" name="Equipo de Redes">
+        <bpmn:flowNodeRef>Task_4</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_5</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_6</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_7</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_3</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_8</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <bpmn:startEvent id="StartEvent_1" name="Incidente de red reportado">
+      <bpmn:outgoing>SF1</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:userTask id="Task_1" name="Registrar ticket">
+      <bpmn:incoming>SF1</bpmn:incoming>
+      <bpmn:outgoing>SF2</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_2" name="Clasificar y priorizar incidente">
+      <bpmn:incoming>SF2</bpmn:incoming>
+      <bpmn:outgoing>SF3</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="Gateway_1" name="¿Es un problema de red?">
+      <bpmn:incoming>SF3</bpmn:incoming>
+      <bpmn:outgoing>SF4</bpmn:outgoing>
+      <bpmn:outgoing>SF6</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:sendTask id="Task_3" name="Escalar a otra área">
+      <bpmn:incoming>SF4</bpmn:incoming>
+      <bpmn:outgoing>SF5</bpmn:outgoing>
+    </bpmn:sendTask>
+
+    <bpmn:endEvent id="EndEvent_2" name="Incidente derivado">
+      <bpmn:incoming>SF5</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1" />
+    </bpmn:endEvent>
+
+    <bpmn:serviceTask id="Task_4" name="Diagnosticar falla de red">
+      <bpmn:incoming>SF6</bpmn:incoming>
+      <bpmn:outgoing>SF7</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:exclusiveGateway id="Gateway_2" name="¿Requiere intervención en sitio?">
+      <bpmn:incoming>SF7</bpmn:incoming>
+      <bpmn:outgoing>SF8</bpmn:outgoing>
+      <bpmn:outgoing>SF11</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:userTask id="Task_5" name="Programar visita técnica">
+      <bpmn:incoming>SF8</bpmn:incoming>
+      <bpmn:outgoing>SF9</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:manualTask id="Task_6" name="Resolver en sitio">
+      <bpmn:incoming>SF9</bpmn:incoming>
+      <bpmn:outgoing>SF10</bpmn:outgoing>
+    </bpmn:manualTask>
+
+    <bpmn:serviceTask id="Task_7" name="Resolver de forma remota">
+      <bpmn:incoming>SF11</bpmn:incoming>
+      <bpmn:outgoing>SF12</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:exclusiveGateway id="Gateway_3" name="Convergencia">
+      <bpmn:incoming>SF10</bpmn:incoming>
+      <bpmn:incoming>SF12</bpmn:incoming>
+      <bpmn:outgoing>SF13</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:serviceTask id="Task_8" name="Verificar restablecimiento del servicio">
+      <bpmn:incoming>SF13</bpmn:incoming>
+      <bpmn:outgoing>SF14</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:sendTask id="Task_9" name="Cerrar ticket y notificar al usuario">
+      <bpmn:incoming>SF14</bpmn:incoming>
+      <bpmn:outgoing>SF15</bpmn:outgoing>
+    </bpmn:sendTask>
+
+    <bpmn:endEvent id="EndEvent_1" name="Incidente resuelto">
+      <bpmn:incoming>SF15</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sequenceFlow id="SF1" sourceRef="StartEvent_1" targetRef="Task_1" />
+    <bpmn:sequenceFlow id="SF2" sourceRef="Task_1" targetRef="Task_2" />
+    <bpmn:sequenceFlow id="SF3" sourceRef="Task_2" targetRef="Gateway_1" />
+    <bpmn:sequenceFlow id="SF4" name="No" sourceRef="Gateway_1" targetRef="Task_3" />
+    <bpmn:sequenceFlow id="SF5" sourceRef="Task_3" targetRef="EndEvent_2" />
+    <bpmn:sequenceFlow id="SF6" name="Sí" sourceRef="Gateway_1" targetRef="Task_4" />
+    <bpmn:sequenceFlow id="SF7" sourceRef="Task_4" targetRef="Gateway_2" />
+    <bpmn:sequenceFlow id="SF8" name="Requiere sitio" sourceRef="Gateway_2" targetRef="Task_5" />
+    <bpmn:sequenceFlow id="SF9" sourceRef="Task_5" targetRef="Task_6" />
+    <bpmn:sequenceFlow id="SF10" sourceRef="Task_6" targetRef="Gateway_3" />
+    <bpmn:sequenceFlow id="SF11" name="Remoto" sourceRef="Gateway_2" targetRef="Task_7" />
+    <bpmn:sequenceFlow id="SF12" sourceRef="Task_7" targetRef="Gateway_3" />
+    <bpmn:sequenceFlow id="SF13" sourceRef="Gateway_3" targetRef="Task_8" />
+    <bpmn:sequenceFlow id="SF14" sourceRef="Task_8" targetRef="Task_9" />
+    <bpmn:sequenceFlow id="SF15" sourceRef="Task_9" targetRef="EndEvent_1" />
+
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1">
+
+      <bpmndi:BPMNShape id="Participant_1_di" bpmnElement="Participant_1" isHorizontal="true">
+        <dc:Bounds x="0" y="0" width="1740" height="540" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Usuario_di" bpmnElement="Lane_Usuario" isHorizontal="true">
+        <dc:Bounds x="30" y="0" width="1710" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_MesaAyuda_di" bpmnElement="Lane_MesaAyuda" isHorizontal="true">
+        <dc:Bounds x="30" y="120" width="1710" height="160" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Redes_di" bpmnElement="Lane_Redes" isHorizontal="true">
+        <dc:Bounds x="30" y="280" width="1710" height="260" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="160" y="42" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_1_di" bpmnElement="Task_1">
+        <dc:Bounds x="260" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_2_di" bpmnElement="Task_2">
+        <dc:Bounds x="410" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1_di" bpmnElement="Gateway_1">
+        <dc:Bounds x="560" y="175" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_3_di" bpmnElement="Task_3">
+        <dc:Bounds x="690" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_2_di" bpmnElement="EndEvent_2">
+        <dc:Bounds x="840" y="182" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_4_di" bpmnElement="Task_4">
+        <dc:Bounds x="690" y="370" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_2_di" bpmnElement="Gateway_2">
+        <dc:Bounds x="840" y="385" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_5_di" bpmnElement="Task_5">
+        <dc:Bounds x="960" y="300" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_6_di" bpmnElement="Task_6">
+        <dc:Bounds x="1110" y="300" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_7_di" bpmnElement="Task_7">
+        <dc:Bounds x="960" y="440" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_3_di" bpmnElement="Gateway_3">
+        <dc:Bounds x="1260" y="385" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_8_di" bpmnElement="Task_8">
+        <dc:Bounds x="1360" y="370" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_9_di" bpmnElement="Task_9">
+        <dc:Bounds x="1510" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1_di" bpmnElement="EndEvent_1">
+        <dc:Bounds x="1660" y="42" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="SF1_di" bpmnElement="SF1">
+        <di:waypoint x="178" y="78" />
+        <di:waypoint x="178" y="200" />
+        <di:waypoint x="260" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF2_di" bpmnElement="SF2">
+        <di:waypoint x="360" y="200" />
+        <di:waypoint x="410" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF3_di" bpmnElement="SF3">
+        <di:waypoint x="510" y="200" />
+        <di:waypoint x="560" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF4_di" bpmnElement="SF4">
+        <di:waypoint x="610" y="200" />
+        <di:waypoint x="690" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF5_di" bpmnElement="SF5">
+        <di:waypoint x="790" y="200" />
+        <di:waypoint x="840" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF6_di" bpmnElement="SF6">
+        <di:waypoint x="585" y="225" />
+        <di:waypoint x="585" y="410" />
+        <di:waypoint x="690" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF7_di" bpmnElement="SF7">
+        <di:waypoint x="790" y="410" />
+        <di:waypoint x="840" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF8_di" bpmnElement="SF8">
+        <di:waypoint x="865" y="385" />
+        <di:waypoint x="865" y="340" />
+        <di:waypoint x="960" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF9_di" bpmnElement="SF9">
+        <di:waypoint x="1060" y="340" />
+        <di:waypoint x="1110" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF10_di" bpmnElement="SF10">
+        <di:waypoint x="1210" y="340" />
+        <di:waypoint x="1285" y="340" />
+        <di:waypoint x="1285" y="385" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF11_di" bpmnElement="SF11">
+        <di:waypoint x="865" y="435" />
+        <di:waypoint x="865" y="480" />
+        <di:waypoint x="960" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF12_di" bpmnElement="SF12">
+        <di:waypoint x="1060" y="480" />
+        <di:waypoint x="1285" y="480" />
+        <di:waypoint x="1285" y="435" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF13_di" bpmnElement="SF13">
+        <di:waypoint x="1310" y="410" />
+        <di:waypoint x="1360" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF14_di" bpmnElement="SF14">
+        <di:waypoint x="1460" y="410" />
+        <di:waypoint x="1460" y="200" />
+        <di:waypoint x="1510" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF15_di" bpmnElement="SF15">
+        <di:waypoint x="1610" y="200" />
+        <di:waypoint x="1678" y="200" />
+        <di:waypoint x="1678" y="78" />
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</bpmn:definitions>
