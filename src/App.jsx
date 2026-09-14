@@ -10,6 +10,7 @@ const PAGES = [
   ['posiciones', 'Posiciones', P.Positions],
   ['mbti', 'MBTI', P.Mbti],
   ['scrum', 'Scrum', P.Scrum],
+  ['idef0', 'IDEF0', P.Idef0],
   ['bpmn', 'BPMN', P.Bpmn],
   ['objetivos', 'Objetivos', P.Goals],
 ]

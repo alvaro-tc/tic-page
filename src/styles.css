@@ -278,6 +278,13 @@ p { margin: 0; }
 .task.done { opacity: .75; }
 .task.done p { text-decoration: line-through; }
 
+/* idef0 */
+.idef0 { border: 1px solid var(--line); border-radius: var(--r); background: #fff; overflow-x: auto; padding: 12px; }
+.idef0 svg { display: block; width: 100%; min-width: 760px; height: auto; }
+.idef0 text { font-size: 13px; fill: #333; }
+.idef0 .box-name { font-size: 15px; font-weight: 600; fill: var(--ink); }
+.idef0 .box-num { font-size: 12px; font-weight: 700; fill: var(--ink); }
+
 /* bpmn */
 .bpmn { position: relative; height: clamp(360px, 62vh, 620px); border: 1px solid var(--line); border-radius: var(--r); background: #fff; overflow: hidden; }
 .bpmn-canvas { position: absolute; inset: 0; }

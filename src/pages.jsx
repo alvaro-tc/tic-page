@@ -41,6 +41,24 @@ const Video = ({ id, title }) => (
   </div>
 )
 
+function Player({ videos, start = 0 }) {
+  const [video, setVideo] = useState(videos[start])
+  return (
+    <div className="player">
+      <Video id={video.id} title={video.title} />
+      <ul className="playlist">
+        {videos.map(v => (
+          <li key={v.id}><button className={v.id === video.id ? 'active' : ''} onClick={() => setVideo(v)}>
+            <img src={`https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`} alt="" /><span><small>{v.tag}</small>{v.title}</span>
+          </button></li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+const WIKI = 'https://upload.wikimedia.org/wikipedia/commons/'
+
 
 /* ---------- 1. Inicio ---------- */
 
@@ -184,7 +202,6 @@ const ARTICLES = [
 const GALLERY = [['1544197150-b99a580bb7a8', 'Cableado estructurado'], ['1535223289827-42f1e9919769', 'Realidad virtual sobre redes de baja latencia'], ['1485827404703-89b55fcc595e', 'Robótica conectada'], ['1581092160562-40aa08e78837', 'Ingeniería en campo']]
 
 export function Science() {
-  const [video, setVideo] = useState(VIDEOS[1])
   return (
     <>
       <Hero tint="lilac" eyebrow="Ciencia, tecnología e innovación" title="Lo que está transformando las redes"
@@ -202,16 +219,7 @@ export function Science() {
       </section>
       <section className="wrap">
         <Head kicker="Videos" title="Aprende en minutos" />
-        <div className="player">
-          <Video id={video.id} title={video.title} />
-          <ul className="playlist">
-            {VIDEOS.map(v => (
-              <li key={v.id}><button className={v.id === video.id ? 'active' : ''} onClick={() => setVideo(v)}>
-                <img src={`https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`} alt="" /><span><small>{v.tag}</small>{v.title}</span>
-              </button></li>
-            ))}
-          </ul>
-        </div>
+        <Player videos={VIDEOS} start={1} />
       </section>
       <section className="wrap">
         <Head kicker="Galería" title="Innovación en imágenes" />
@@ -652,9 +660,149 @@ export function Scrum() {
   )
 }
 
-/* ---------- 9. BPMN ---------- */
+/* ---------- 9. IDEF0 ---------- */
 
-const WIKI = 'https://upload.wikimedia.org/wikipedia/commons/'
+const IDEF0_VIDEOS = [
+  { id: 'POgINKz6st8', tag: 'Introducción', title: 'IDEF0: método de modelado de funciones' },
+  { id: 'k9OYt2QEZ8A', tag: 'Metodología', title: 'Metodología IDEF0' },
+  { id: 'Y67fVQf-zP8', tag: 'Procesos', title: 'Caracterización de procesos con IDEF0' },
+  { id: 'JJliR70X-ZA', tag: 'Innovación', title: 'Procesos para innovar: IDEF0' },
+  { id: 'fgFd9dvSu9E', tag: 'Inglés', title: 'Function modelling using IDEF0' },
+]
+const ICOM = [
+  ['Entradas', '→', 'Llegan por la izquierda: lo que la función transforma (datos, materiales, requerimientos).', 'blue'],
+  ['Controles', '↓', 'Bajan por arriba: normas, políticas y restricciones que regulan cómo se realiza la función.', 'yellow'],
+  ['Salidas', '→', 'Salen por la derecha: el resultado de la función, que suele ser entrada o control de otra.', 'green'],
+  ['Mecanismos', '↑', 'Suben por abajo: personas, herramientas y sistemas que ejecutan la función.', 'pink'],
+]
+// [nodo, nombre, control, mecanismo, salida, color, descripción] — '|' separa líneas en el SVG
+const IDEF0_STEPS = [
+  ['A1', 'Analizar|requerimientos', 'Presupuesto|y alcance', 'Coordinador|de Redes', 'Especificación|técnica', 'yellow', 'Relevar usuarios, sedes, servicios y crecimiento esperado para fijar el alcance.'],
+  ['A2', 'Diseñar|topología', 'Normas TIA/EIA-568|e IEEE 802.3', 'Administrador|· Packet Tracer', 'Plano de red y|direccionamiento IP', 'blue', 'Definir topología, VLAN, direccionamiento y equipos; validar en simulador.'],
+  ['A3', 'Instalar y|configurar', 'Políticas de|seguridad', 'Administrador|y Seguridad', 'Red|configurada', 'pink', 'Montar cableado y racks, configurar switches, routers y firewall con hardening.'],
+  ['A4', 'Probar y|monitorear', 'SLA de|disponibilidad 99.9 %', 'Soporte ·|Zabbix / Grafana', 'Red LAN operativa|y documentada', 'green', 'Certificar enlaces, pruebas de carga y alta de alertas antes de entregar.'],
+]
+
+const Lbl = ({ x, y, t, a = 'middle', className }) => (
+  <text x={x} y={y} textAnchor={a} className={className}>
+    {t.split('|').map((s, i) => <tspan key={i} x={x} dy={i ? 15 : 0}>{s}</tspan>)}
+  </text>
+)
+const Arw = ({ d }) => <path d={d} fill="none" stroke="var(--ink)" strokeWidth="1.6" markerEnd="url(#idef0-head)" />
+const Box = ({ x, y, w, h, name, n, c }) => (
+  <g>
+    <rect x={x} y={y} width={w} height={h} rx="4" fill={`var(--${c})`} stroke="var(--ink)" strokeWidth="1.8" />
+    <Lbl x={x + w / 2} y={y + h / 2 - 3} t={name} className="box-name" />
+    <text x={x + w - 8} y={y + h - 8} textAnchor="end" className="box-num">{n}</text>
+  </g>
+)
+
+function Idef0Diagram() {
+  const [view, setView] = useState('A0')
+  const head = (
+    <defs><marker id="idef0-head" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="var(--ink)" />
+    </marker></defs>
+  )
+  return (
+    <>
+      <div className="pills" role="tablist">
+        {[['A-0', 'A-0 · Contexto'], ['A0', 'A0 · Descomposición']].map(([k, t]) => (
+          <button key={k} role="tab" aria-selected={k === view} className={k === view ? 'active' : ''} onClick={() => setView(k)}>{t}</button>
+        ))}
+      </div>
+      <div className="idef0">
+        {view === 'A-0' ? (
+          <svg viewBox="0 0 1200 520" role="img" aria-label="Diagrama IDEF0 A-0: Implementar red LAN corporativa">
+            {head}
+            <Arw d="M150 235 H470" /><Lbl x={160} y={206} a="start" t="Requerimientos de|conectividad" />
+            <Arw d="M150 295 H470" /><Lbl x={160} y={266} a="start" t="Equipos, cableado|y licencias" />
+            <Arw d="M540 20 V190" /><Lbl x={532} y={90} a="end" t="Normas TIA/EIA-568|e IEEE 802.3" />
+            <Arw d="M660 20 V190" /><Lbl x={668} y={90} a="start" t="Políticas de seguridad|y presupuesto" />
+            <Arw d="M730 235 H1050" /><Lbl x={1040} y={206} a="end" t="Red LAN|operativa" />
+            <Arw d="M730 295 H1050" /><Lbl x={1040} y={266} a="end" t="Documentación|técnica" />
+            <Arw d="M540 500 V330" /><Lbl x={532} y={420} a="end" t="Equipo de|Redes" />
+            <Arw d="M660 500 V330" /><Lbl x={668} y={420} a="start" t="Packet Tracer|y Zabbix" />
+            <Box x={470} y={190} w={260} h={140} name="Implementar red|LAN corporativa" n="A0" c="peach" />
+          </svg>
+        ) : (
+          <svg viewBox="0 0 1200 680" role="img" aria-label="Diagrama IDEF0 A0: analizar, diseñar, instalar y probar la red LAN">
+            {head}
+            <Arw d="M10 115 H160" /><Lbl x={12} y={86} a="start" t="Requerimientos|de conectividad" />
+            {IDEF0_STEPS.map(([n, name, ctrl, mech, out, c], i) => {
+              const x = 160 + 240 * i, y = 70 + 120 * i, cy = y + 45, last = i === IDEF0_STEPS.length - 1
+              return (
+                <g key={n}>
+                  <Arw d={`M${x + 120} 0 V${y}`} /><Lbl x={x + 128} y={20} a="start" t={ctrl} />
+                  <Arw d={`M${x + 40} 680 V${y + 90}`} /><Lbl x={x + 48} y={645} a="start" t={mech} />
+                  {last
+                    ? <><Arw d={`M${x + 160} ${cy} H1190`} /><Lbl x={1190} y={cy - 22} a="end" t={out} /></>
+                    : <><Arw d={`M${x + 160} ${cy} H${x + 200} V${cy + 120} H${x + 240}`} /><Lbl x={x + 194} y={y + 118} a="end" t={out} /></>}
+                  <Box x={x} y={y} w={160} h={90} name={name} n={n} c={c} />
+                </g>
+              )
+            })}
+          </svg>
+        )}
+      </div>
+      <p className="muted hint">
+        {view === 'A-0'
+          ? 'Diagrama de contexto: una sola función con todas sus entradas, controles, salidas y mecanismos.'
+          : 'Nivel A0: la función se descompone en cuatro subfunciones; la salida de cada una alimenta a la siguiente.'}
+      </p>
+    </>
+  )
+}
+
+export function Idef0() {
+  return (
+    <>
+      <Hero tint="peach" eyebrow="IDEF0" title="Funciones, no solo pasos"
+        sub="Integration Definition for Function Modeling: modela qué hace un sistema, qué lo controla y con qué recursos lo logra." />
+      <section className="wrap">
+        <Head kicker="Nuestro modelo" title="Implementar una red LAN corporativa" sub="Cambia entre el diagrama de contexto y su descomposición." />
+        <Idef0Diagram />
+        <div className="grid g4 tips">
+          {IDEF0_STEPS.map(([n, name, , , , c, d]) => (
+            <article key={n} className={`card sm bg-${c}`}><span className="eyebrow">{n}</span><h3>{name.replace('|', ' ')}</h3><p>{d}</p></article>
+          ))}
+        </div>
+      </section>
+      <section className="wrap split">
+        <div>
+          <Head kicker="¿Qué es IDEF0?" title="Un mapa de lo que hace la organización" />
+          <p className="muted">IDEF0 nació en el programa ICAM de la Fuerza Aérea de EE. UU. a partir de SADT y fue publicado como estándar federal (FIPS 183) en 1993. Representa cada función como una caja y sus relaciones como flechas, y la descompone jerárquicamente —de A0 hacia A1, A11…— hasta el nivel de detalle necesario.</p>
+        </div>
+        <ol className="steps">
+          {['Definir el propósito y el punto de vista', 'Dibujar el diagrama de contexto A-0', 'Descomponer en 3 a 6 funciones', 'Conectar entradas, controles, salidas y mecanismos', 'Revisar con expertos (ciclo autor-lector)'].map(s => <li key={s}>{s}</li>)}
+        </ol>
+      </section>
+      <section className="wrap">
+        <Head kicker="Notación ICOM" title="Una caja, cuatro lados" />
+        <div className="grid g4">
+          {ICOM.map(([t, i, d, c]) => (
+            <article key={t} className={`card bg-${c}`}><span className="icon">{i}</span><h3>{t}</h3><p>{d}</p></article>
+          ))}
+        </div>
+      </section>
+      <section className="wrap">
+        <Head kicker="Videos" title="Aprende IDEF0 en minutos" />
+        <Player videos={IDEF0_VIDEOS} />
+      </section>
+      <section className="wrap">
+        <Head kicker="Galería" title="IDEF0 en imágenes" sub="Figuras del estándar y ejemplos · Wikimedia Commons." />
+        <div className="gallery contain">
+          {[['3/31/IDEF_Diagram_Example.jpg', 'Diagrama de ejemplo'], ['0/06/1_Box_Syntax.svg', 'Sintaxis de la caja'], ['1/1b/3_Arrow_Positions_and_Roles.svg', 'Posición y rol de las flechas'], ['c/ca/6_Decomposition_Structure.svg', 'Estructura de descomposición']].map(([f, t]) => (
+            <figure key={f}><img src={WIKI + f} alt={`Diagrama IDEF0: ${t}`} loading="lazy" /><figcaption>{t}</figcaption></figure>
+          ))}
+        </div>
+      </section>
+    </>
+  )
+}
+
+/* ---------- 10. BPMN ---------- */
+
 const BPMN_VIDEOS = [
   { id: 'NIMRIVpyKIY', tag: '2 min', title: 'BPMN – Qué es y para qué sirve' },
   { id: 'k8pqgMgKxmA', tag: 'Conceptos', title: '¿En qué consiste la notación BPMN 2.0?' },
@@ -710,7 +858,6 @@ function BpmnDiagram() {
 }
 
 export function Bpmn() {
-  const [video, setVideo] = useState(BPMN_VIDEOS[0])
   return (
     <>
       <Hero tint="blue" eyebrow="BPMN" title="Procesos que todos pueden leer"
@@ -743,16 +890,7 @@ export function Bpmn() {
       </section>
       <section className="wrap">
         <Head kicker="Videos" title="Aprende BPMN en minutos" />
-        <div className="player">
-          <Video id={video.id} title={video.title} />
-          <ul className="playlist">
-            {BPMN_VIDEOS.map(v => (
-              <li key={v.id}><button className={v.id === video.id ? 'active' : ''} onClick={() => setVideo(v)}>
-                <img src={`https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`} alt="" /><span><small>{v.tag}</small>{v.title}</span>
-              </button></li>
-            ))}
-          </ul>
-        </div>
+        <Player videos={BPMN_VIDEOS} />
       </section>
       <section className="wrap">
         <Head kicker="Galería" title="BPMN en imágenes" sub="Ejemplos de diagramas · Wikimedia Commons." />
@@ -766,7 +904,7 @@ export function Bpmn() {
   )
 }
 
-/* ---------- 10. Goals ---------- */
+/* ---------- 11. Goals ---------- */
 
 // derivados de los objetivos, misión y visión de cada rol
 const COMPANY_GOALS = [
