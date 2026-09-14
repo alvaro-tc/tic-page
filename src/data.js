@@ -5,7 +5,7 @@ export const PUESTOS = [
   {
     clave: 'coordinador', codigo: 'TIC-RED-001', denominacion: 'Scrum Master / Coordinador de Redes', categoria: 'Directivo', color: 'yellow', icon: '◎',
     // integrante y perfil MBTI ilustrativos (página MBTI)
-    person: 'Andrés León', mbti: 'ENFJ', alias: 'El Protagonista',
+    person: 'Oziel Rodman Ramos Torrez', mbti: 'ENFJ', alias: 'El Protagonista',
     perfil: 'Líder cercano que alinea al equipo en torno a objetivos claros. Detecta tensiones antes de que escalen y convierte los impedimentos en acuerdos concretos.',
     fortalezas: ['Facilita reuniones productivas', 'Motiva y da visibilidad al trabajo del equipo', 'Media entre áreas técnicas y la dirección'],
     retos: ['Puede asumir demasiados compromisos', 'Le cuesta dar feedback negativo directo'],
