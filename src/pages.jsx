@@ -675,14 +675,7 @@ const ICOM = [
   ['Salidas', '→', 'Salen por la derecha: el resultado de la función, que suele ser entrada o control de otra.', 'green'],
   ['Mecanismos', '↑', 'Suben por abajo: personas, herramientas y sistemas que ejecutan la función.', 'pink'],
 ]
-// [nodo, nombre, control, mecanismo, salida, color, descripción] — '|' separa líneas en el SVG
-const IDEF0_STEPS = [
-  ['A1', 'Analizar|requerimientos', 'Presupuesto|y alcance', 'Coordinador|de Redes', 'Especificación|técnica', 'yellow', 'Relevar usuarios, sedes, servicios y crecimiento esperado para fijar el alcance.'],
-  ['A2', 'Diseñar|topología', 'Normas TIA/EIA-568|e IEEE 802.3', 'Administrador|· Packet Tracer', 'Plano de red y|direccionamiento IP', 'blue', 'Definir topología, VLAN, direccionamiento y equipos; validar en simulador.'],
-  ['A3', 'Instalar y|configurar', 'Políticas de|seguridad', 'Administrador|y Seguridad', 'Red|configurada', 'pink', 'Montar cableado y racks, configurar switches, routers y firewall con hardening.'],
-  ['A4', 'Probar y|monitorear', 'SLA de|disponibilidad 99.9 %', 'Soporte ·|Zabbix / Grafana', 'Red LAN operativa|y documentada', 'green', 'Certificar enlaces, pruebas de carga y alta de alertas antes de entregar.'],
-]
-
+// '|' separa líneas en el SVG
 const Lbl = ({ x, y, t, a = 'middle', className }) => (
   <text x={x} y={y} textAnchor={a} className={className}>
     {t.split('|').map((s, i) => <tspan key={i} x={x} dy={i ? 15 : 0}>{s}</tspan>)}
@@ -698,23 +691,13 @@ const Box = ({ x, y, w, h, name, n, c }) => (
 )
 
 function Idef0Diagram() {
-  const [view, setView] = useState('A0')
-  const head = (
-    <defs><marker id="idef0-head" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-      <path d="M0 0 L10 5 L0 10 z" fill="var(--ink)" />
-    </marker></defs>
-  )
   return (
     <>
-      <div className="pills" role="tablist">
-        {[['A-0', 'A-0 · Contexto'], ['A0', 'A0 · Descomposición']].map(([k, t]) => (
-          <button key={k} role="tab" aria-selected={k === view} className={k === view ? 'active' : ''} onClick={() => setView(k)}>{t}</button>
-        ))}
-      </div>
       <div className="idef0">
-        {view === 'A-0' ? (
           <svg viewBox="0 0 1200 520" role="img" aria-label="Diagrama IDEF0 A-0: Implementar red LAN corporativa">
-            {head}
+            <defs><marker id="idef0-head" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+              <path d="M0 0 L10 5 L0 10 z" fill="var(--ink)" />
+            </marker></defs>
             <Arw d="M150 235 H470" /><Lbl x={160} y={206} a="start" t="Requerimientos de|conectividad" />
             <Arw d="M150 295 H470" /><Lbl x={160} y={266} a="start" t="Equipos, cableado|y licencias" />
             <Arw d="M540 20 V190" /><Lbl x={532} y={90} a="end" t="Normas TIA/EIA-568|e IEEE 802.3" />
@@ -725,31 +708,8 @@ function Idef0Diagram() {
             <Arw d="M660 500 V330" /><Lbl x={668} y={420} a="start" t="Packet Tracer|y Zabbix" />
             <Box x={470} y={190} w={260} h={140} name="Implementar red|LAN corporativa" n="A0" c="peach" />
           </svg>
-        ) : (
-          <svg viewBox="0 0 1200 680" role="img" aria-label="Diagrama IDEF0 A0: analizar, diseñar, instalar y probar la red LAN">
-            {head}
-            <Arw d="M10 115 H160" /><Lbl x={12} y={86} a="start" t="Requerimientos|de conectividad" />
-            {IDEF0_STEPS.map(([n, name, ctrl, mech, out, c], i) => {
-              const x = 160 + 240 * i, y = 70 + 120 * i, cy = y + 45, last = i === IDEF0_STEPS.length - 1
-              return (
-                <g key={n}>
-                  <Arw d={`M${x + 120} 0 V${y}`} /><Lbl x={x + 128} y={20} a="start" t={ctrl} />
-                  <Arw d={`M${x + 40} 680 V${y + 90}`} /><Lbl x={x + 48} y={645} a="start" t={mech} />
-                  {last
-                    ? <><Arw d={`M${x + 160} ${cy} H1190`} /><Lbl x={1190} y={cy - 22} a="end" t={out} /></>
-                    : <><Arw d={`M${x + 160} ${cy} H${x + 200} V${cy + 120} H${x + 240}`} /><Lbl x={x + 194} y={y + 118} a="end" t={out} /></>}
-                  <Box x={x} y={y} w={160} h={90} name={name} n={n} c={c} />
-                </g>
-              )
-            })}
-          </svg>
-        )}
       </div>
-      <p className="muted hint">
-        {view === 'A-0'
-          ? 'Diagrama de contexto: una sola función con todas sus entradas, controles, salidas y mecanismos.'
-          : 'Nivel A0: la función se descompone en cuatro subfunciones; la salida de cada una alimenta a la siguiente.'}
-      </p>
+      <p className="muted hint">Una sola función con sus entradas (izquierda), controles (arriba), salidas (derecha) y mecanismos (abajo).</p>
     </>
   )
 }
@@ -760,13 +720,8 @@ export function Idef0() {
       <Hero tint="peach" eyebrow="IDEF0" title="Funciones, no solo pasos"
         sub="Integration Definition for Function Modeling: modela qué hace un sistema, qué lo controla y con qué recursos lo logra." />
       <section className="wrap">
-        <Head kicker="Nuestro modelo" title="Implementar una red LAN corporativa" sub="Cambia entre el diagrama de contexto y su descomposición." />
+        <Head kicker="Nuestro modelo" title="Implementar una red LAN corporativa" sub="Diagrama de contexto IDEF0 del proceso." />
         <Idef0Diagram />
-        <div className="grid g4 tips">
-          {IDEF0_STEPS.map(([n, name, , , , c, d]) => (
-            <article key={n} className={`card sm bg-${c}`}><span className="eyebrow">{n}</span><h3>{name.replace('|', ' ')}</h3><p>{d}</p></article>
-          ))}
-        </div>
       </section>
       <section className="wrap split">
         <div>
