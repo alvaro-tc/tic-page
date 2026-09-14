@@ -37,6 +37,10 @@ export default function App() {
     return () => removeEventListener('hashchange', onHash)
   }, [])
 
+  useEffect(() => {
+    document.querySelector('.tabs .active')?.scrollIntoView({ inline: 'center', block: 'nearest' })
+  }, [page])
+
   const Current = (PAGES.find(p => p[0] === page) ?? PAGES[0])[2]
 
   return (

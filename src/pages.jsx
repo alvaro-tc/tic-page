@@ -976,6 +976,7 @@ export function Contact() {
                   <span className="grow">
                     <b>{p.person}</b>
                     {tel && <small><a href={`tel:+591${tel}`}>📞 {tel}</a></small>}
+                    {tel && <small><a href={`https://wa.me/591${tel}`} target="_blank" rel="noopener noreferrer">💬 Abrir WhatsApp</a></small>}
                     {mail && <small><a href={`mailto:${mail}`}>✉️ {mail}</a></small>}
                   </span>
                 </div>
