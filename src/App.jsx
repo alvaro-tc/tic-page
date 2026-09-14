@@ -13,6 +13,7 @@ const PAGES = [
   ['idef0', 'IDEF0', P.Idef0],
   ['bpmn', 'BPMN', P.Bpmn],
   ['objetivos', 'Objetivos', P.Goals],
+  ['contacto', 'Contacto', P.Contact],
 ]
 
 export function Logo() {

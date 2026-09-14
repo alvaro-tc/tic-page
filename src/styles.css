@@ -97,7 +97,8 @@ p { margin: 0; }
 .g2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); }
 .g3 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr)); }
 .g4 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
-.split { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; align-items: center; }
+.theory-p + .theory-p { margin-top: 12px; }
+.split {display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; align-items: center; }
 
 .card { border-radius: var(--r); padding: 26px; }
 .card.sm { padding: 18px; }

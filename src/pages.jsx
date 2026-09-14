@@ -23,6 +23,19 @@ const Head = ({ kicker, title, sub }) => (
   </div>
 )
 
+// bloque de teoría al inicio de cada sección: definición + conceptos clave
+const Theory = ({ title, text, points, aside }) => (
+  <section className="wrap split">
+    <div>
+      <Head kicker="Teoría" title={title} />
+      {text.map(t => <p key={t} className="muted theory-p">{t}</p>)}
+    </div>
+    {aside ?? <div className="grid g2">
+      {points.map(([t, d, c]) => <div key={t} className={`card sm bg-${c}`}><h3>{t}</h3><p>{d}</p></div>)}
+    </div>}
+  </section>
+)
+
 // nombre + primer apellido: "Alvaro Ariel Torrez Calle" → "AT"
 const initials = name => { const w = name.split(' '); return w[0][0] + w[Math.max(1, w.length - 2)][0] }
 
@@ -95,6 +108,11 @@ export function Home() {
         </div>
       </Hero>
 
+      <Theory title="¿Qué es una red de computadoras?"
+        text={['Una red de computadoras es un conjunto de dispositivos (computadoras, servidores, teléfonos, sensores) interconectados mediante medios físicos o inalámbricos que intercambian datos y comparten recursos siguiendo reglas comunes llamadas protocolos, como TCP/IP.',
+          'Una red inteligente, además de transportar datos, se administra por software: se monitorea en tiempo real, se automatiza y se protege de forma proactiva. Las Tecnologías de la Información y Comunicación (TIC) integran estas redes con el hardware, el software y las personas para generar valor en la organización.']}
+        points={[['LAN', 'Red de área local: une equipos dentro de un edificio u oficina.', 'blue'], ['WAN', 'Red de área amplia: conecta sedes separadas geográficamente.', 'green'], ['Protocolo', 'Conjunto de reglas que define cómo se envían y reciben los datos.', 'yellow'], ['Infraestructura', 'Cableado, switches, routers, firewalls y servidores que sostienen la red.', 'pink']]} />
+
       <section className="wrap">
         <Head kicker="Área de trabajo" title="Especialistas en redes" sub="Todo el ciclo de vida de tu infraestructura, en un solo equipo." />
         <div className="grid g3">
@@ -163,6 +181,10 @@ export function Tech() {
     <>
       <Hero tint="blue" eyebrow="Gestión de tecnologías" title="Las herramientas detrás de cada conexión"
         sub="Seleccionamos, evaluamos y gestionamos el ciclo de vida de cada tecnología que implementamos." />
+      <Theory title="¿Qué es una tecnología?"
+        text={['Una tecnología es el conjunto de conocimientos, técnicas, herramientas y procesos que se aplican de forma ordenada para resolver un problema o satisfacer una necesidad. En una organización, la tecnología se materializa en equipos, software, métodos y en las capacidades de las personas que los operan.',
+          'La gestión de tecnologías es el proceso de planificar, seleccionar, adquirir, implementar, mantener y retirar las tecnologías de la empresa, alineándolas con su estrategia para obtener ventaja competitiva y controlar riesgos y costos durante todo su ciclo de vida.']}
+        points={[['Tecnología dura', 'Elementos tangibles: equipos, dispositivos, cableado, servidores.', 'blue'], ['Tecnología blanda', 'Conocimiento, métodos y organización: procesos, gestión, estándares.', 'lilac'], ['Madurez', 'Grado de estabilidad de una tecnología: piloto, adopción o estándar.', 'green'], ['Obsolescencia', 'Momento en que una tecnología deja de ser útil, segura o soportada.', 'pink']]} />
       <section className="wrap">
         <div className="pills" role="tablist">
           {cats.map(c => <button key={c} role="tab" aria-selected={c === cat} className={c === cat ? 'active' : ''} onClick={() => setCat(c)}>{c}</button>)}
@@ -206,6 +228,10 @@ export function Science() {
     <>
       <Hero tint="lilac" eyebrow="Ciencia, tecnología e innovación" title="Lo que está transformando las redes"
         sub="Artículos, videos e imágenes seleccionados por nuestro equipo." />
+      <Theory title="¿Qué son la ciencia, la tecnología y la innovación?"
+        text={['La ciencia es el conocimiento sistemático obtenido mediante la observación, la experimentación y el método científico; busca explicar el porqué de los fenómenos. La tecnología aplica ese conocimiento para crear herramientas y soluciones prácticas.',
+          'La innovación es la introducción de un producto, servicio, proceso o modelo nuevo o significativamente mejorado que genera valor real al llegar al mercado o a la organización (Manual de Oslo, OCDE). Juntas forman el sistema de Ciencia, Tecnología e Innovación (CTI), motor del desarrollo económico y social.']}
+        points={[['Ciencia', 'Genera conocimiento: investigación básica y aplicada.', 'lilac'], ['Tecnología', 'Transforma el conocimiento en herramientas y técnicas.', 'blue'], ['Innovación incremental', 'Mejora gradual de algo que ya existe.', 'green'], ['Innovación disruptiva', 'Cambio radical que redefine un mercado o una industria.', 'pink']]} />
       <section className="wrap">
         <Head kicker="Artículos" title="Lecturas destacadas" />
         <div className="grid g3">
@@ -261,6 +287,10 @@ export function Mission() {
     <>
       <Hero tint="green" eyebrow="Misión y visión" title="Conectamos personas, datos y oportunidades"
         sub="La misión es quiénes somos hoy; la visión, a dónde queremos llegar." />
+      <Theory title="¿Qué son la misión y la visión?"
+        text={['La misión es la declaración de la razón de ser de una organización: describe qué hace, para quién lo hace, cómo lo hace y qué valor aporta. Está orientada al presente y guía las decisiones del día a día.',
+          'La visión es la imagen del futuro deseado: expresa lo que la organización aspira a llegar a ser en el mediano o largo plazo. Debe ser inspiradora, clara y alcanzable. Ambas, junto con los valores, forman la base de la planificación estratégica.']}
+        points={[['Misión', 'Presente: propósito y razón de ser.', 'yellow'], ['Visión', 'Futuro: meta a la que se aspira llegar.', 'blue'], ['Valores', 'Principios que orientan la conducta de las personas.', 'green'], ['Planificación estratégica', 'Proceso que traduce misión y visión en objetivos y acciones.', 'pink']]} />
       {block('IATECH', 'La empresa', '▦',
         ['Nuestra misión es transformar la prestación de servicios médicos mediante el desarrollo de soluciones de software innovadoras que prioricen los resultados (outcomes) sobre los simples entregables. Nos comprometemos a actuar como administradores (stewards) diligentes y éticos, garantizando la integridad de los datos de salud y el cumplimiento riguroso de las normativas de seguridad, para entregar un valor tangible que mejore la calidad de vida de los pacientes y la eficiencia de los profesionales médicos.',
           ['Software médico', 'Ética', 'Datos de salud'], 'yellow'],
@@ -344,6 +374,10 @@ export function OrgChart() {
         </div>
         <p className="muted hint">¿Todo junto? <a href={`${DOCS}manual-de-funciones.pdf`} target="_blank" rel="noopener">Descargar el manual de funciones (PDF)</a></p>
       </Hero>
+      <Theory title="¿Qué es un organigrama?"
+        text={['Un organigrama es la representación gráfica de la estructura formal de una organización. Muestra las áreas o puestos que la componen, los niveles jerárquicos, las líneas de autoridad y las relaciones de comunicación entre ellos.',
+          'Sirve para saber quién reporta a quién, evitar duplicidad de funciones, facilitar la toma de decisiones y orientar a nuevos integrantes. Puede ser vertical, horizontal, circular o matricial, y clasificarse según su alcance (general o específico) y su contenido (estructural, funcional o de personal).']}
+        points={[['Jerarquía', 'Niveles de autoridad ordenados de mayor a menor.', 'yellow'], ['Línea de autoridad', 'Relación directa de mando entre un superior y un subordinado.', 'blue'], ['Tramo de control', 'Número de personas que supervisa directamente un puesto.', 'green'], ['Relación funcional', 'Coordinación entre áreas sin relación de mando.', 'pink']]} />
       <section className="wrap">
         <Head kicker="Sobre el organigrama" title="Cómo está organizada el área" />
         <div className="grid g4">
@@ -432,6 +466,10 @@ export function Positions() {
   return (
     <>
       <Hero tint="pink" eyebrow="Descripción de posiciones" title="Cada rol, con propósito" sub="Todas las posiciones del Departamento de Redes. Selecciona un puesto para abrir su manual institucional." />
+      <Theory title="¿Qué es una descripción de puestos?"
+        text={['La descripción de puestos (o de posiciones) es un documento formal que detalla qué se hace en un cargo, por qué se hace, cómo y bajo qué condiciones. Resulta del análisis de puestos y se reúne en el manual de funciones de la organización.',
+          'Es la base de la gestión del talento humano: permite reclutar y seleccionar al perfil adecuado, capacitar, evaluar el desempeño con indicadores, definir remuneraciones y delimitar responsabilidades y autoridad, evitando conflictos y vacíos de funciones.']}
+        points={[['Identificación', 'Nombre, código, nivel y ubicación del puesto en la estructura.', 'pink'], ['Propósito', 'Razón de ser del puesto dentro del área.', 'yellow'], ['Funciones', 'Tareas y responsabilidades principales que debe cumplir.', 'blue'], ['Perfil', 'Formación, experiencia y competencias requeridas.', 'green']]} />
       <section className="wrap">
         <Head kicker={`${PUESTOS.length} posiciones`} title="Puestos del organigrama" />
         <div className="grid g4">
@@ -483,6 +521,10 @@ export function Mbti() {
     <>
       <Hero tint="lilac" eyebrow="MBTI" title="Conocernos para trabajar mejor"
         sub="El Myers-Briggs Type Indicator describe preferencias de personalidad en 4 dimensiones que combinan 16 tipos." />
+      <Theory title="¿Qué es el MBTI?"
+        text={['El Indicador de Tipos de Myers-Briggs (MBTI) es un instrumento de autoevaluación de la personalidad desarrollado por Katharine Cook Briggs e Isabel Briggs Myers a partir de la teoría de los tipos psicológicos de Carl Jung (1921).',
+          'Clasifica las preferencias de una persona en cuatro dimensiones opuestas; la combinación de una letra de cada par da como resultado uno de 16 tipos de personalidad. En las organizaciones se usa para mejorar la comunicación, el trabajo en equipo y el autoconocimiento, no para medir capacidades ni seleccionar personal.']}
+        points={[['Tipo psicológico', 'Patrón estable de preferencias al percibir y decidir.', 'lilac'], ['Dimensión', 'Par de preferencias opuestas, como E/I o T/F.', 'yellow'], ['Preferencia', 'Tendencia natural, no una habilidad ni un límite.', 'green'], ['Temperamento', 'Agrupación de tipos con rasgos comunes.', 'blue']]} />
       <section className="wrap">
         <Head kicker="Departamento de Redes" title="Nuestro equipo" sub="Perfiles de cada integrante del organigrama. Usamos MBTI para mejorar la comunicación, nunca para seleccionar ni descartar personas." />
         <div className="grid team">
@@ -639,6 +681,10 @@ export function Scrum() {
     <>
       <Hero tint="yellow" eyebrow="Scrum" title="Entregas cortas, mejora constante"
         sub="Marco ágil que usamos en proyectos de red: sprints de 2 semanas con valor visible en cada entrega." />
+      <Theory title="¿Qué es Scrum?"
+        text={['Scrum es un marco de trabajo ágil, ligero, para desarrollar y mantener productos complejos. Fue creado por Ken Schwaber y Jeff Sutherland y se describe en la Guía de Scrum. Se basa en el empirismo: transparencia, inspección y adaptación.',
+          'El trabajo se organiza en Sprints, ciclos cortos de duración fija (1 a 4 semanas) en los que un equipo autoorganizado entrega un incremento de valor utilizable. Kanban lo complementa con un tablero visual que muestra el flujo de las tareas y limita el trabajo en curso.']}
+        points={[['Agilidad', 'Capacidad de responder al cambio entregando valor de forma incremental.', 'yellow'], ['Sprint', 'Iteración de duración fija que produce un incremento.', 'blue'], ['Empirismo', 'Decidir con base en lo observado: transparencia, inspección y adaptación.', 'green'], ['Kanban', 'Método visual para gestionar el flujo de trabajo por columnas.', 'pink']]} />
       <section className="wrap">
         <Head kicker="Tablero Kanban · Departamento de Redes" title="Sprint 4 en curso" sub="Tareas asignadas a cada puesto del organigrama. Arrastra las tarjetas entre columnas; los cambios se guardan en tu navegador." />
         <Kanban />
@@ -719,18 +765,15 @@ export function Idef0() {
     <>
       <Hero tint="peach" eyebrow="IDEF0" title="Funciones, no solo pasos"
         sub="Integration Definition for Function Modeling: modela qué hace un sistema, qué lo controla y con qué recursos lo logra." />
+      <Theory title="¿Qué es IDEF0?"
+        text={['IDEF0 (Integration Definition for Function Modeling) es un método de modelado de funciones que describe qué hace un sistema u organización, qué necesita para hacerlo y qué produce. Cada función se representa como una caja y sus relaciones como flechas.',
+          'Nació en el programa ICAM de la Fuerza Aérea de EE. UU. a partir de SADT y fue publicado como estándar federal (FIPS 183) en 1993. Descompone las funciones jerárquicamente —de A0 hacia A1, A11…— hasta el nivel de detalle necesario.']}
+        aside={<ol className="steps">
+          {['Definir el propósito y el punto de vista', 'Dibujar el diagrama de contexto A-0', 'Descomponer en 3 a 6 funciones', 'Conectar entradas, controles, salidas y mecanismos', 'Revisar con expertos (ciclo autor-lector)'].map(s => <li key={s}>{s}</li>)}
+        </ol>} />
       <section className="wrap">
         <Head kicker="Nuestro modelo" title="Implementar una red LAN corporativa" sub="Diagrama de contexto IDEF0 del proceso." />
         <Idef0Diagram />
-      </section>
-      <section className="wrap split">
-        <div>
-          <Head kicker="¿Qué es IDEF0?" title="Un mapa de lo que hace la organización" />
-          <p className="muted">IDEF0 nació en el programa ICAM de la Fuerza Aérea de EE. UU. a partir de SADT y fue publicado como estándar federal (FIPS 183) en 1993. Representa cada función como una caja y sus relaciones como flechas, y la descompone jerárquicamente —de A0 hacia A1, A11…— hasta el nivel de detalle necesario.</p>
-        </div>
-        <ol className="steps">
-          {['Definir el propósito y el punto de vista', 'Dibujar el diagrama de contexto A-0', 'Descomponer en 3 a 6 funciones', 'Conectar entradas, controles, salidas y mecanismos', 'Revisar con expertos (ciclo autor-lector)'].map(s => <li key={s}>{s}</li>)}
-        </ol>
       </section>
       <section className="wrap">
         <Head kicker="Notación ICOM" title="Una caja, cuatro lados" />
@@ -817,6 +860,12 @@ export function Bpmn() {
     <>
       <Hero tint="blue" eyebrow="BPMN" title="Procesos que todos pueden leer"
         sub="Business Process Model and Notation: el estándar para dibujar cómo fluye el trabajo entre personas, áreas y sistemas." />
+      <Theory title="¿Qué es BPMN?"
+        text={['Un proceso de negocio es una secuencia de actividades que transforma entradas en un resultado de valor para un cliente. BPMN (Business Process Model and Notation) es la notación gráfica estándar para representar esos procesos.',
+          'Está estandarizada por el Object Management Group (OMG) e ISO/IEC 19510. La versión 2.0 define símbolos y reglas precisas para que analistas, técnicos y directivos entiendan el mismo diagrama sin ambigüedad, e incluso para que un motor de procesos pueda ejecutarlo.']}
+        aside={<ol className="steps">
+          {['Documenta cómo se trabaja hoy', 'Detecta cuellos de botella y responsables', 'Alinea a negocio y tecnología', 'Base para automatizar procesos'].map(s => <li key={s}>{s}</li>)}
+        </ol>} />
       <section className="wrap">
         <Head kicker="Nuestro proceso" title="Gestión de incidentes de red" sub="Arrastra para moverte y usa Ctrl + rueda del ratón (o los botones) para hacer zoom." />
         <BpmnDiagram />
@@ -825,15 +874,6 @@ export function Bpmn() {
             <article key={n} className={`card sm bg-${c}`}><span className="eyebrow">Carril</span><h3>{n}</h3><ol className="lane-steps">{steps.map(s => <li key={s}>{s}</li>)}</ol></article>
           ))}
         </div>
-      </section>
-      <section className="wrap split">
-        <div>
-          <Head kicker="¿Qué es BPMN?" title="Un lenguaje común para los procesos" />
-          <p className="muted">BPMN es una notación gráfica estandarizada por el Object Management Group (OMG) e ISO/IEC 19510. La versión 2.0 define símbolos y reglas precisas para que analistas, técnicos y directivos entiendan el mismo diagrama sin ambigüedad, e incluso para que un motor de procesos pueda ejecutarlo.</p>
-        </div>
-        <ol className="steps">
-          {['Documenta cómo se trabaja hoy', 'Detecta cuellos de botella y responsables', 'Alinea a negocio y tecnología', 'Base para automatizar procesos'].map(s => <li key={s}>{s}</li>)}
-        </ol>
       </section>
       <section className="wrap">
         <Head kicker="Notación" title="Los elementos básicos" />
@@ -876,6 +916,10 @@ export function Goals() {
   return (
     <>
       <Hero tint="green" eyebrow="Objetivos" title="Objetivos claros, responsables claros" sub="Objetivos estratégicos de la empresa y el objetivo, misión y visión de cada rol." />
+      <Theory title="¿Qué es un objetivo?"
+        text={['Un objetivo es el resultado concreto que una organización, área o persona se propone alcanzar en un plazo determinado. Traduce la misión y la visión en metas medibles que orientan el trabajo y permiten evaluar el avance.',
+          'Los objetivos estratégicos marcan el rumbo de toda la empresa a largo plazo; los tácticos y operativos los desagregan por área y por puesto. Para ser útiles deben ser SMART: específicos, medibles, alcanzables, relevantes y con un tiempo definido.']}
+        points={[['Estratégico', 'Largo plazo, para toda la organización.', 'green'], ['Táctico', 'Mediano plazo, por departamento o área.', 'blue'], ['Operativo', 'Corto plazo, por equipo o puesto de trabajo.', 'yellow'], ['SMART', 'Específico, medible, alcanzable, relevante y temporal.', 'pink']]} />
       <section className="wrap">
         <Head kicker="Empresa" title="Objetivos estratégicos" />
         <div className="grid g4">
@@ -900,6 +944,44 @@ export function Goals() {
               ))}
             </article>
           ))}
+        </div>
+      </section>
+    </>
+  )
+}
+
+/* ---------- 12. Contacto ---------- */
+
+// clave = primer nombre de p.person
+const CONTACTOS = {
+  Alvaro: ['65696932', 'alvarotorrezc@gmail.com'],
+  Luis: ['60539827', 'Luis.paredes@ucb.edu.bo'],
+  Rodny: ['78485719', 'rodny.siles@ucb.edu.bo'],
+  Oziel: ['78831211'],
+}
+
+export function Contact() {
+  return (
+    <>
+      <Hero tint="green" eyebrow="Contacto" title="Hablemos" sub="Escríbenos o llámanos directamente." />
+      <section className="wrap">
+        <Head kicker="Departamento de Redes" title="Contactos del equipo" />
+        <div className="grid team">
+          {PUESTOS.map(p => {
+            const [tel, mail] = CONTACTOS[p.person.split(' ')[0]] ?? []
+            return (
+              <article key={p.clave} className={`card bg-${p.color}`}>
+                <div className="row">
+                  <Avatar p={p} size={64} />
+                  <span className="grow">
+                    <b>{p.person}</b>
+                    {tel && <small><a href={`tel:+591${tel}`}>📞 {tel}</a></small>}
+                    {mail && <small><a href={`mailto:${mail}`}>✉️ {mail}</a></small>}
+                  </span>
+                </div>
+              </article>
+            )
+          })}
         </div>
       </section>
     </>
