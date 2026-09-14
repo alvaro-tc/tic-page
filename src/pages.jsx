@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { POSITIONS, PUESTOS, VIDEOS, img } from './data.js'
+import { PUESTOS, VIDEOS, img } from './data.js'
 
 /* ---------- shared bits ---------- */
 
@@ -429,7 +429,7 @@ export function Mbti() {
         sub="El Myers-Briggs Type Indicator describe preferencias de personalidad en 4 dimensiones que combinan 16 tipos." />
       <section className="wrap">
         <Head kicker="Departamento de Redes" title="Nuestro equipo" sub="Perfiles de cada integrante del organigrama. Usamos MBTI para mejorar la comunicación, nunca para seleccionar ni descartar personas." />
-        <div className="grid g2">
+        <div className="grid team">
           {PUESTOS.map(p => {
             const g = groupOf(p.mbti)
             return (
@@ -617,10 +617,13 @@ const COMPANY_GOALS = [
   ['Talento', '100% del equipo técnico certificado', 55, 'pink'],
 ]
 
+// avance actual de cada indicador del manual de puestos (mismo orden que p.indicadores)
+const PROGRESS = { coordinador: [92, 78, 85, 70], administrador: [100, 88, 90, 65], seguridad: [72, 60, 100, 45], soporte: [86, 95, 80, 90] }
+
 export function Goals() {
-  const areas = ['Todas', ...new Set(POSITIONS.map(p => p.area))]
+  const areas = ['Todas', ...new Set(PUESTOS.map(p => p.categoria))]
   const [area, setArea] = useState('Todas')
-  const people = POSITIONS.filter(p => area === 'Todas' || p.area === area)
+  const people = PUESTOS.filter(p => area === 'Todas' || p.categoria === area)
   return (
     <>
       <Hero tint="green" eyebrow="Goals" title="Objetivos claros, responsables claros" sub="Metas de la empresa para este año y la asignación de objetivos personales." />
@@ -639,12 +642,12 @@ export function Goals() {
         <div className="pills">
           {areas.map(a => <button key={a} className={a === area ? 'active' : ''} onClick={() => setArea(a)}>{a}</button>)}
         </div>
-        <div className="grid g3">
+        <div className="grid g2">
           {people.map(p => (
-            <article key={p.id} className="card white">
-              <div className="row"><Avatar p={p} size={48} /><span className="grow"><b>{p.person}</b><small className="muted">{p.title}</small></span></div>
-              {p.goals.map(([g, v]) => (
-                <div key={g} className="goal"><div className="goal-line"><span>{g}</span><b>{v}%</b></div><Bar value={v} color={p.color} /></div>
+            <article key={p.clave} className="card white">
+              <div className="row"><Avatar p={p} size={48} /><span className="grow"><b>{p.person}</b><small className="muted">{p.denominacion}</small></span></div>
+              {p.indicadores.map(([g, meta], i) => (
+                <div key={g} className="goal"><div className="goal-line"><span>{g} <small className="muted">· meta {meta}</small></span><b>{PROGRESS[p.clave][i]}%</b></div><Bar value={PROGRESS[p.clave][i]} color={p.color} /></div>
               ))}
             </article>
           ))}
