@@ -56,6 +56,9 @@ export default function App() {
       <main><Current /></main>
       <footer className="foot">
         <Logo /> <span>© {new Date().getFullYear()} IATECH · Soluciones en redes y conectividad</span>
+        <a className="foot-link" href="https://iatech-co-frontend.vercel.app" target="_blank" rel="noopener noreferrer">
+          Inventario IATECH <span aria-hidden="true">↗</span>
+        </a>
       </footer>
     </>
   )

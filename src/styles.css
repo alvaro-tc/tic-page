@@ -316,3 +316,7 @@ p { margin: 0; }
 .goal-line { display: flex; justify-content: space-between; gap: 10px; font-size: .9rem; }
 
 .foot { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 40px 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; text-align: center; flex-wrap: wrap; }
+.foot-link { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); font-weight: 500; text-decoration: none; transition: background .2s, border-color .2s; }
+.foot-link span { transition: transform .2s; }
+.foot-link:hover, .foot-link:focus-visible { background: var(--lilac); border-color: var(--lilac); }
+.foot-link:hover span { transform: translate(2px, -2px); }
