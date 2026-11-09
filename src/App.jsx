@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
 import * as P from './pages.jsx'
+import { Tableau } from './sections/Tableau.jsx'
+import { Weka } from './sections/Weka.jsx'
+import { Presupuesto } from './sections/Presupuesto.jsx'
 
 const PAGES = [
   ['inicio', 'Inicio', P.Home],
@@ -13,6 +16,10 @@ const PAGES = [
   ['idef0', 'IDEF0', P.Idef0],
   ['bpmn', 'BPMN', P.Bpmn],
   ['objetivos', 'Objetivos', P.Goals],
+  ['tableau', 'Datos Tableau', Tableau],
+  ['weka', 'Patrones Weka', Weka],
+  ['monitoreo', 'Monitoreo', P.Monitoreo],
+  ['presupuesto', 'Presupuesto', Presupuesto],
   ['contacto', 'Contacto', P.Contact],
 ]
 

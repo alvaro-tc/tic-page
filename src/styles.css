@@ -320,3 +320,7 @@ p { margin: 0; }
 .foot-link span { transition: transform .2s; }
 .foot-link:hover, .foot-link:focus-visible { background: var(--lilac); border-color: var(--lilac); }
 .foot-link:hover span { transform: translate(2px, -2px); }
+
+/* monitoreo (PRTG) */
+.monitor { border: 1px solid var(--line); border-radius: var(--r); background: #fff; overflow: hidden; }
+.monitor iframe { display: block; width: 100%; height: clamp(420px, 70vh, 720px); border: 0; }

@@ -4,7 +4,7 @@ import DIAGRAM_URL from '../docs/bpmn/gestion-incidentes-red_1.bpmn?url'
 
 /* ---------- shared bits ---------- */
 
-function Hero({ eyebrow, title, sub, tint = 'yellow', children }) {
+export function Hero({ eyebrow, title, sub, tint = 'yellow', children }) {
   return (
     <section className={`hero tint-${tint}`}>
       {eyebrow && <span className="eyebrow">{eyebrow}</span>}
@@ -15,7 +15,7 @@ function Hero({ eyebrow, title, sub, tint = 'yellow', children }) {
   )
 }
 
-const Head = ({ kicker, title, sub }) => (
+export const Head = ({ kicker, title, sub }) => (
   <div className="head">
     {kicker && <span className="eyebrow">{kicker}</span>}
     <h2>{title}</h2>
@@ -24,7 +24,7 @@ const Head = ({ kicker, title, sub }) => (
 )
 
 // bloque de teoría al inicio de cada sección: definición + conceptos clave
-const Theory = ({ title, text, points, aside }) => (
+export const Theory = ({ title, text, points, aside }) => (
   <section className="wrap split">
     <div>
       <Head kicker="Teoría" title={title} />
@@ -942,6 +942,94 @@ export function Goals() {
               {[['Objetivo', p.objetivo], ['Misión', p.mision], ['Visión', p.vision]].map(([k, v]) => (
                 <div key={k} className="goal mvv"><span className="eyebrow">{k}</span><p>{v}</p></div>
               ))}
+            </article>
+          ))}
+        </div>
+      </section>
+    </>
+  )
+}
+
+/* ---------- Monitoreo (mapa de red PRTG) ---------- */
+
+// URL del mapa publicado en PRTG (Mapa de Redes Simple). Se define en .env.local (no se sube a git):
+// VITE_PRTG_MAP_URL=http://127.0.0.1/public/mapshow.htm?id=2111&mapid=<clave>
+const PRTG_MAP_URL = import.meta.env.VITE_PRTG_MAP_URL
+const PRTG_ADMIN_URL = 'http://127.0.0.1:1615/maps/2111/designer'
+
+// [dispositivo, sensor, umbral, responsable, acción ante alerta]
+const SENSORES = [
+  ['Router core', 'Ping (ICMP)', 'Latencia > 100 ms o pérdida > 2%', 'Soporte y Monitoreo', 'Abrir ticket y verificar enlace y energía del equipo.'],
+  ['Switch piso 2', 'SNMP: tráfico de puertos', 'Uso > 80% del ancho de banda', 'Administrador', 'Revisar el puerto saturado y aplicar QoS o balanceo.'],
+  ['Firewall', 'SNMP: CPU y memoria', 'CPU > 85% sostenida 5 min', 'Seguridad', 'Analizar sesiones y reglas; descartar ataque o exceso de tráfico.'],
+  ['Servidor DHCP', 'Disponibilidad (servicio y puerto)', 'Sin respuesta 2 lecturas seguidas', 'Soporte y Monitoreo', 'Reiniciar el servicio y escalar al Administrador si persiste.'],
+  ['Enlace ISP', 'NetFlow / sFlow', 'Tráfico > 90% del contrato', 'Administrador', 'Identificar los mayores consumidores y contactar al proveedor.'],
+]
+
+const FLUJO_INCIDENTE = [
+  ['Alerta', 'PRTG detecta que un sensor supera su umbral y notifica al equipo.', 'pink'],
+  ['Ticket', 'Soporte y Monitoreo registra el incidente con prioridad y responsable.', 'yellow'],
+  ['Diagnóstico', 'Se revisan métricas, logs y el mapa para hallar la causa raíz.', 'blue'],
+  ['Resolución', 'Se aplica la corrección y se confirma que el sensor vuelve a Up.', 'green'],
+  ['Reporte', 'Se documenta causa, tiempo de resolución y mejoras preventivas.', 'lilac'],
+]
+
+export function Monitoreo() {
+  const [key, setKey] = useState(0)
+  return (
+    <>
+      <Hero tint="blue" eyebrow="Monitoreo" title="Estado de la red en vivo"
+        sub="Vista del mapa de red de PRTG: cada icono cambia de color según el estado de los dispositivos y sensores." />
+      <Theory title="¿Qué es el monitoreo de red?"
+        text={['El monitoreo de red es la supervisión continua de equipos, enlaces y servicios para conocer su disponibilidad y rendimiento, detectar fallas antes de que afecten a los usuarios y contar con datos para planificar la capacidad.',
+          'Se apoya en protocolos como SNMP (consulta de contadores y estado de los equipos), ICMP (ping para medir latencia y disponibilidad) y NetFlow (análisis del tráfico por origen, destino y aplicación). PRTG Network Monitor reúne estos datos mediante sensores, compara cada lectura con umbrales y genera alertas y mapas en tiempo real.']}
+        points={[['Sensores', 'Cada sensor mide una métrica: ping, tráfico, CPU, disponibilidad de un servicio.', 'yellow'], ['SNMP / ICMP / NetFlow', 'Protocolos que obtienen estado, latencia y flujos de tráfico.', 'blue'], ['Umbrales y alertas', 'Límites que, al superarse, avisan al equipo por correo o ticket.', 'pink'], ['PRTG Network Monitor', 'Plataforma que centraliza sensores, mapas, alertas y reportes.', 'green']]} />
+      <section className="wrap">
+        <Head kicker="PRTG Network Monitor" title="Mapa de Redes Simple" sub="Se actualiza automáticamente cada pocos segundos." />
+        {PRTG_MAP_URL ? (
+          <div className="monitor">
+            <iframe key={key} src={PRTG_MAP_URL} title="Mapa de red PRTG" loading="lazy" />
+          </div>
+        ) : (
+          <div className="card white">
+            <h3>Falta configurar el mapa</h3>
+            <p>Crea el archivo <code>.env.local</code> con la URL pública del mapa y reinicia <code>npm run dev</code>:</p>
+            <pre className="muted">VITE_PRTG_MAP_URL=http://127.0.0.1/public/mapshow.htm?id=2111&amp;mapid=TU_CLAVE</pre>
+          </div>
+        )}
+        <div className="pills">
+          <button onClick={() => setKey(k => k + 1)}>Recargar mapa</button>
+          <a className="btn" href={PRTG_ADMIN_URL} target="_blank" rel="noopener noreferrer">Abrir en PRTG ↗</a>
+        </div>
+        <div className="grid g3 tips">
+          {[['Verde', 'Sensores en estado correcto (Up).', 'green'], ['Amarillo', 'Advertencias que conviene revisar.', 'yellow'], ['Rojo', 'Sensores caídos (Down): requieren atención.', 'pink']].map(([t, d, c]) => (
+            <article key={t} className={`card sm bg-${c}`}><h3>{t}</h3><p>{d}</p></article>
+          ))}
+        </div>
+      </section>
+      <section className="wrap">
+        <Head kicker="Ejemplo aplicado" title="Sensores que monitorea el equipo" sub="Cada sensor tiene un umbral, un responsable y una acción definida cuando salta la alerta." />
+        <div className="card white" style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <thead>
+              <tr>{['Dispositivo', 'Sensor', 'Umbral', 'Responsable', 'Acción ante alerta'].map(h => <th key={h} className="eyebrow" style={{ padding: '8px 10px' }}>{h}</th>)}</tr>
+            </thead>
+            <tbody>
+              {SENSORES.map(r => (
+                <tr key={r[0]} style={{ borderTop: '1px solid var(--line)' }}>
+                  {r.map((c, i) => i ? <td key={i} className="muted" style={{ padding: '8px 10px' }}>{c}</td> : <th key={i} style={{ padding: '8px 10px' }}>{c}</th>)}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section className="wrap">
+        <Head kicker="Flujo de incidente" title="De la alerta al reporte" sub="Ejemplo: el sensor Ping del router core supera los 100 ms." />
+        <div className="grid g4">
+          {FLUJO_INCIDENTE.map(([t, d, c], i) => (
+            <article key={t} className={`card bg-${c}`}>
+              <strong className="num">0{i + 1}</strong><h3>{t}</h3><p>{d}</p>
             </article>
           ))}
         </div>
